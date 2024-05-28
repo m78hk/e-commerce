@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user['email'] === $email && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = 1;
             $_SESSION['email'] = $user['email'];
+            $userFound = true;
             header('Location: index.php');
             exit;
         }
