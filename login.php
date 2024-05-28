@@ -69,11 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="formCheck" class="form-check-label text-secondary"><small>Remember Me</small></label>
                     </div>
                     <div class="forgot">
-                        <small><a href="./forgot password.html">Forgot Password?</a></small>
+                        <small><a href="./forgot password.php">Forgot Password?</a></small>
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    <button class="btn btn-lg btn-primary w-100 fs-6">Login</button>
+                    <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">Login</button>
                 </div>
                 <div class="row">
                     <small>Don't have account? <a href="singup.php">Sign Up</a></small>
