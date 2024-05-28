@@ -1,5 +1,8 @@
-<!--header-->
-<?php include 'header.php'; 
+<?php
+session_start();
+/*--header--*/
+include 'header.php'; 
+/*--end of header--*/
 
 $error = '';
 
