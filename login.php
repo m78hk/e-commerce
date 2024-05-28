@@ -1,5 +1,34 @@
 <!--header-->
-<?php include 'header.php'; ?>
+<?php include 'header.php'; 
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $users = [
+        ['email' => 'test@example.com', 'password' => password_hash('password123', PASSWORD_DEFAULT)],
+
+    ];
+
+    $userFound = false;
+
+    foreach ($users as $user) {
+        if ($user['email'] === $email && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = 1;
+            $_SESSION['email'] $user['email'];
+            header('Location: index.php');
+            exit;
+        }
+    }
+
+    if (!$userFound) {
+        $error = 'Invalid email or password';
+    }
+}
+?>
+
 <!--end of header-->
 
 <!--body-->
@@ -19,11 +48,17 @@
                     <h2>Hello,Again</h2>
                     <p>We are happy to have you back.</p>
                 </div>
+                <?php if ($error): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <?php echo htmlspecialchars($error); ?>
+                    </div>
+                <?php endif; ?>
+                <form method="post" action="login.php">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
+                    <input type="text" name="email" class="form-control form-control-lg bg-light fs-6" placeholder="Email address" required>
                 </div>
                 <div class="input-group mb-1">
-                    <input type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Password">
+                    <input type="password" name="password" class="form-control form-control-lg bg-light fs-6" placeholder="Password" required>
                 </div>
                 <div class="input-group mb-5 d-flex justify-content-between">
                     <div class="form-check">
@@ -40,6 +75,7 @@
                 <div class="row">
                     <small>Don't have account? <a href="singup.php">Sign Up</a></small>
                 </div>
+                </form>
             </div>
         </div>
     </div>
