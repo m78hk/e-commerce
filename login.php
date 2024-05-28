@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($users as $user) {
         if ($user['email'] === $email && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = 1;
-            $_SESSION['email'] $user['email'];
+            $_SESSION['email'] = $user['email'];
             header('Location: index.php');
             exit;
         }
