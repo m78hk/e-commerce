@@ -27,39 +27,43 @@ function updateCart($product_id, $quantity) {
     foreach ($_SESSION['cart'] as &$item) {
         if ($item['product_id'] == $product_id) {
             $item['quantity'] = $quantity;
-            echo json_encode(['status' => 'success']);
+            sendResponse(['status' => 'success']);
             exit;
         }
     }
-    echo json_encode(['status' => 'error']);
+    sendResponse(['status' => 'error']);
 }
 
 function removeFromCart($product_id) {
     foreach ($_SESSION['cart'] as $key => $item) {
         if ($item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
-            echo json_encode(['status' => 'success']);
+            sendResponse(['status' => 'success']);
             exit;
         }
     }
-    echo json_encode(['status' => 'error']);
+    sendResponse(['status' => 'error']);
 }
 
 
 function addToCart($product_id) {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
     foreach ($_SESSION['cart'] as $item) {
         if ($item['product_id'] == $product_id) {
-            echo json_encode(['status' => 'error', 'message' => 'Product already in cart']);
+            sendResponse(['status' => 'error', 'message' => 'Product already in cart']);
             return;
         }
     }
     $_SESSION['cart'][] = ['product_id' => $product_id, 'quantity' => 1];
-    echo json_encode(['status' => 'success']);
+    sendResponse(['status' => 'success']);
 }
 
+function sendResponse($response) {
+    $totalQuantity = array_sum(array_column($_SESSION['cart'], 'quantity'));
+    $response['totalQuantity'] = $totalQuantity;
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
 
 $subtotal = 0;
 foreach ($_SESSION['cart'] as $item) {
@@ -84,7 +88,7 @@ include 'header.php';
         <div class="cart-box">
             <div class="shop">
                 <?php
-                if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+                if (isset($_SESSION['cart'])) {
                     foreach ($_SESSION['cart'] as $item) {
                         foreach ($products as $product) {
                             if ($product['product_id'] == $item['product_id']) {
@@ -134,6 +138,7 @@ include 'header.php';
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
+                    updateCartCount(response.totalQuantity);
                     location.reload();
                 } else {
                     alert('Failed to update cart');
@@ -151,6 +156,7 @@ include 'header.php';
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
+                    updateCartCount(response.totalQuantity);
                     location.reload();
                 } else {
                     alert('Failed to remove from cart');
@@ -159,6 +165,9 @@ include 'header.php';
         };
         xhr.send('product_id=' + productId + '&remove=true');
     }
+        function updateCartCount(totalQuantity) {
+            document.querySelector('.nav-btns .badge.bg-primary').innerHTML = totalQuantity;
+        }
     </script>
 </body>
 <!--end of header-->
