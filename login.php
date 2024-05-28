@@ -4,6 +4,8 @@ session_start();
 include 'header.php'; 
 /*--end of header--*/
 
+ob_start();
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Invalid email or password';
     }
 }
+
+ob_end_flush();
+
 ?>
 
 <!--end of header-->
