@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 /*--header--*/
 include 'header.php'; 
@@ -25,13 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $userFound = true;
 
-            echo 'User found, redirecting...';
+            orror_log('User found, redirecting to index.php...');
+            ob_end_clean();
             header('Location: index.php');
             exit();
         }
     }
 
     if (!$userFound) {
+        error_log('User not found or invalid password.');
         $error = 'Invalid email or password';
     }
 }
