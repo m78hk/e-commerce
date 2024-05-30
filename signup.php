@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php echo htmlspecialchars($error); ?>
                         </div>
                    <?php endif; ?>
-                   <form method="post" action="singup.php">
+                   <form method="post" action="signup.php">
                        <div class="input-group mb-3">
                            <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name" value="<?php echo htmlspecialchars($name); ?>">
                        </div>
