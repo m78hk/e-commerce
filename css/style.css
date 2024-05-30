@@ -123,10 +123,8 @@ body{
 
 
 /*header*/
- 
-#header{
-    /*background: url(../img/Discovery\ Sport\ _\ Adventure\ runs\ in\ the\ family.mp4) top/cover no-repeat;*/
-}
+
+
 .header {
     font-family: var(--lg-font);
     background-color: #fff;
@@ -192,6 +190,14 @@ body{
     color: #fff !important;
 }
 
+.collection-img img.small-img {
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 .collection-img span{
     top: 20px;
     right: 20px;
@@ -201,7 +207,7 @@ body{
 }
 
 .collection-img:hover img{
-    transform:scale(1.2)
+    transform: none;
 }
 
 /*newsletter*/
@@ -483,11 +489,11 @@ a {
 .btn-update {
     display: inline-block;
     padding: 10px 25px;
-    background-color: var(--pink); /* 使用您定義的粉紅色 */
+    background-color: var(--pink); 
     color: white;
     cursor: pointer;
     border-radius: 5px;
-    border: none; /* 移除邊框 */
+    border: none; 
     transition: background-color 0.3s ease;
 }
 

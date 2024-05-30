@@ -31,13 +31,13 @@ session_start();
       <?php $filterClass = strtolower(str_replace(' ', '-', $product['best_seller_label'])); ?>
       <div class="col-md-6 col-lg-4 col-xl-3 p-2 <?php echo $filterClass; ?>">
       <div class="collection-img position-relative">
-      <img src="<?php echo $product['image']; ?>" class="w-100">
-      <?php if (!empty($product['label'])): ?>
-        <span class="position-absolute bg-primary text-white d-flex align-items-center justify-content-center">
-          <?php echo $product['label']; ?>
-        </span>
-      <?php endif; ?>
-    </div>
+             <img src="<?php echo $product['image']; ?>" class="small-img">
+             <?php if (!empty($product['label'])): ?>
+                <span class="position-absolute bg-primary text-white d-flex align-items-center justify-content-center">
+                   <?php echo $product['label']; ?>
+                </span>
+             <?php endif; ?>
+      </div>
     <div class="text-center">
       <div class="rating mt-3">
         <br>
