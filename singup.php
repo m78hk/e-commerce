@@ -11,17 +11,22 @@ $users = [
 $error = '';
 $success = '';
 
+$name = '';
+$email = '';
+$password = '';
+$confirm_password = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $confrom_password = trim($_POST['confrom_password']);
+    $confirm_password = trim($_POST['confirm_password']);
 
-    if (empty($name) || empty($email) || empty($password) || empty($confromPassword)) {
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = 'All fields are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Invalid email format.';
-    } elseif ($password !== $confirmPassword) {
+    } elseif ($password !== $confirm_password) {
         $error = 'Password do not match.';
     } else {
         $userExists = false;
@@ -29,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user['email'] === $email) {
                 $userExists = true;
                 break;
-            
             }
         }
 
@@ -38,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $users[] = ['name' => $name, 'email' => $email, 'password' => $hashedPassword];
-            $success = 'Registration successful. You can now log in.';
-            $name = $email = $password = $confirmPassword = '';
+            header('Location: login.php');
+            exit();
         }
     }
 }
@@ -67,12 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php echo htmlspecialchars($error); ?>
                         </div>
                    <?php endif; ?>
-                   <?php if ($success): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo htmlspecialchars($success); ?>
-                        </div>
-                   <?php endif; ?>
-                   <form method="post" action="signup.php">
+                   <form method="post" action="singup.php">
                        <div class="input-group mb-3">
                            <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name" value="<?php echo htmlspecialchars($name); ?>">
                        </div>
@@ -80,14 +79,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address" value="<?php echo htmlspecialchars($email); ?>">
                        </div>
                        <div class="input-group mb-1">
-                           <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password" value="<?php echo htmlspecialchars($Password); ?>">
+                           <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password">
                        </div>
                        <div class="input-group mb-1">
-                        <input type="password"  name="confrom password"class="form-control form-control-lg bg-light fs-6" placeholder="Confrom Password" value="<?php echo htmlspecialchars($Confirm Password); ?>">
+                        <input type="password"  name="confirm_password"class="form-control form-control-lg bg-light fs-6" placeholder="Confirm Password">
                        </div>
                        <div class="input-group mb-5 d-flex justify-content-between">
                            <div class="forgot">
-                               <small><a href="./forgot password.php">Forgot Password?</a></small>
+                               <small><a href="./forgot_password.php">Forgot Password?</a></small>
                            </div>
                        </div>
                        <div class="input-group mb-3">
