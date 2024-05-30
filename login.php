@@ -1,11 +1,11 @@
 <?php
+ob_start();
 
-session_start();
 /*--header--*/
 include 'header.php'; 
 /*--end of header--*/
 
-ob_start();
+
 
 $error = '';
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $userFound = true;
 
-            orror_log('User found, redirecting to index.php...');
+            error_log('User found, redirecting to index.php...');
             ob_end_clean();
             header('Location: index.php');
             exit();
