@@ -1,6 +1,49 @@
-<!--header-->
- <?php include 'header.php'; ?>
-<!--end of header-->
+<?php
+
+/*--header--*/
+  include 'header.php'; 
+/*--end of header--*/
+
+$users = [
+    ['name' => 'Mr Test', 'email' => 'mrtest@example.com', 'password' => password_hash('password', PASSWORD_DEFAULT)],
+];
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $confrom_password = trim($_POST['confrom_password']);
+
+    if (empty($name) || empty($email) || empty($password) || empty($confromPassword)) {
+        $error = 'All fields are required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Invalid email format.';
+    } elseif ($password !== $confirmPassword) {
+        $error = 'Password do not match.';
+    } else {
+        $userExists = false;
+        foreach ($users as $user) {
+            if ($user['email'] === $email) {
+                $userExists = true;
+                break;
+            
+            }
+        }
+
+        if ($userExists) {
+            $error = 'Email already registered.';
+        } else {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $users[] = ['name' => $name, 'email' => $email, 'password' => $hashedPassword];
+            $success = 'Registration successful. You can now log in.';
+            $name = $email = $password = $confirmPassword = '';
+        }
+    }
+}
+?>
 
 <!--body-->
 <body id="body" class="vh-100 carousel slide " data-bs-ride ="carousel" style="padding-top: 104px;">
@@ -19,26 +62,38 @@
                        <h2>SignUp</h2>
                        <p>We are happy to you have join.</p>
                    </div>
-                   <div class="input-group mb-3">
-                       <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name">
-                   </div>
-                   <div class="input-group mb-3">
-                       <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
-                   </div>
-                   <div class="input-group mb-1">
-                       <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password">
-                   </div>
-                   <div class="input-group mb-1">
-                    <input type="password"  name="confrom password"class="form-control form-control-lg bg-light fs-6" placeholder="Confrom Password">
-                </div>
-                   <div class="input-group mb-5 d-flex justify-content-between">
-                       <div class="forgot">
-                           <small><a href="./forgot password.html">Forgot Password?</a></small>
+                   <?php if ($error): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?php echo htmlspecialchars($error); ?>
+                        </div>
+                   <?php endif; ?>
+                   <?php if ($success): ?>
+                        <div class="alert alert-success" role="alert">
+                            <?php echo htmlspecialchars($success); ?>
+                        </div>
+                   <?php endif; ?>
+                   <form method="post" action="signup.php">
+                       <div class="input-group mb-3">
+                           <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name" value="<?php echo htmlspecialchars($name); ?>">
                        </div>
-                   </div>
-                   <div class="input-group mb-3">
-                       <button class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
-                   </div>
+                       <div class="input-group mb-3">
+                           <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address" value="<?php echo htmlspecialchars($email); ?>">
+                       </div>
+                       <div class="input-group mb-1">
+                           <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password" value="<?php echo htmlspecialchars($Password); ?>">
+                       </div>
+                       <div class="input-group mb-1">
+                        <input type="password"  name="confrom password"class="form-control form-control-lg bg-light fs-6" placeholder="Confrom Password" value="<?php echo htmlspecialchars($Confirm Password); ?>">
+                       </div>
+                       <div class="input-group mb-5 d-flex justify-content-between">
+                           <div class="forgot">
+                               <small><a href="./forgot password.php">Forgot Password?</a></small>
+                           </div>
+                       </div>
+                       <div class="input-group mb-3">
+                           <button class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
+                       </div>
+                   </form>
                </div>
            </div>
        </div>
