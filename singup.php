@@ -20,13 +20,16 @@
                        <p>We are happy to you have join.</p>
                    </div>
                    <div class="input-group mb-3">
-                       <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
+                       <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name">
+                   </div>
+                   <div class="input-group mb-3">
+                       <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address">
                    </div>
                    <div class="input-group mb-1">
-                       <input type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Password">
+                       <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password">
                    </div>
                    <div class="input-group mb-1">
-                    <input type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Confrom Password">
+                    <input type="password"  name="confrom password"class="form-control form-control-lg bg-light fs-6" placeholder="Confrom Password">
                 </div>
                    <div class="input-group mb-5 d-flex justify-content-between">
                        <div class="forgot">
