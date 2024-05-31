@@ -199,8 +199,8 @@ body{
 }
 
 .collection-img span{
-    top: 20px;
-    right: 20px;
+    top: 5px;
+    right: 100px;
     width: 46px;
     height: 46px;
     border-radius: 50%;
