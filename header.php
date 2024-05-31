@@ -4,6 +4,11 @@ session_start();
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
+
+if (!isset($_SESSION['checklist'])) {
+    $_SESSION['checklist'] = [];
+
+}
 ?>
 
 <!doctype html>
@@ -36,18 +41,15 @@ if (!isset($_SESSION['cart'])) {
               <button type = "button" class = "btn position-relative">
                   <a href="./cert.php">
                     <i class="fa fa-shopping-cart" style="color: #2dd796;"></i>
-                    <span id="cart-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary"><?php if (!empty($_SESSION['cart'])) {
-                      echo array_sum(array_column($_SESSION['cart'], 'quantity'));
-                    } else {
-                      echo 0;
-                    }
-                    ?></span>
+                    <span id="cart-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary"><?php echo array_sum(array_column($_SESSION['cart'], 'quantity'));?></span>
                   </a>
               </button>
               <button type = "button" class = "btn position-relative">
                   <a href="./my_checklist.php">
                     <i class = "fa fa-heart" style="color: #2dd796;"></i>
-                    <span class = "position-absolute top-0 start-100 translate-middle badge bg-primary">1</span>
+                    <span id="checklist-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary">
+                      <?php echo count($_SESSION['checklist']); ?>
+                    </span>
                   </a>
               </button>
               <button type = "button" class = "btn position-relative">

@@ -1,9 +1,10 @@
 <?php
- session_start();
+session_start();
+include 'stock.php';
 
- include 'stock.php';
+$response = ['status' => 'error', 'checklistCount' => 0];
 
- if (isset($_POST['product_id'])) {
+if (isset($_POST['product_id'])) {
     $productId = $_POST['product_id'];
 
     $productFound = false;
@@ -19,13 +20,30 @@
             $_SESSION['checklist'] = [];
         }
 
-        $_SESSION['checklist'][] = $product;
+        
+        $alreadyInChecklist = false;
+        foreach ($_SESSION['checklist'] as $item) {
+            if ($item['product_id'] == $productId) {
+                $alreadyInChecklist = true;
+                break;
+            }
+        }
 
-        echo json_encode(['status' => 'success', 'message' => 'Product added to checklist']);
+        if (!$alreadyInChecklist) {
+            $_SESSION['checklist'][] = $product;
+            $response['status'] = 'success';
+        } else {
+            $response['status'] = 'already_in_checklist';
+            
+        }
+        
+        $response['checklistCount'] = count($_SESSION['checklist']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid product ID']);
+        $response['status'] = 'invalid_product_id';
     }
- } else {
-    echo json_encode(['status' => 'error', 'message' => 'No product ID provided']);
- }
- ?>
+} else {
+    $response['status'] = 'no_product_id';
+}
+
+echo json_encode($response);
+?>

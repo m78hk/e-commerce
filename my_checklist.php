@@ -2,9 +2,9 @@
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-	if ($_POST['action'] === 'remove_form_checklist' && isset($_POST['product_id'])) {
+	if ($_POST['action'] === 'remove_from_checklist' && isset($_POST['product_id'])) {
 		$product_id = $_POST['product_id'];
-		removeFromCart($product_id);
+		removeFromChecklist($product_id);
 	} elseif ($_POST['action'] === 'add_to_cart' && isset($_POST['product_id'])) {
 		$product_id = $_POST['product_id'];
 		addToCart($product_id);
@@ -16,6 +16,7 @@ function removeFromChecklist($product_id) {
 		foreach ($_SESSION['checklist'] as $key => $item) {
 			if ($item['product_id'] == $product_id) {
 				unset($_SESSION['checklist'][$key]);
+				$_SESSION['checklist'] = array_values($_SESSION['checklist']);
 				return;
 			}
 		}

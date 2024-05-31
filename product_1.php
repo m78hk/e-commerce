@@ -155,14 +155,19 @@ function addToChecklist(productId) {
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'add_to_checklist.php', true);
-  //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
-      alert(response.message);
+      if (response.status === 'success') {
+        updateChecklistCount(response.checklistCount);
+      }
     }
   };
   xhr.send(formData);
+}
+
+function updateChecklistCount(count) {
+  document.querySelector('#checklist-count').innerHTML = count;
 }
 
 </script>
