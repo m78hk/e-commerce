@@ -1,6 +1,22 @@
 <?php 
-session_start();
+  session_start();
+  include 'stock.php';
 
+  if (isset($_POST['add_to_checklist']) && !empty($_POST['product_id'])) {
+    $productId = $_POST['product_id'];
+
+    $productFound = false;
+    foreach ($products as $product) {
+      if ($product['product_id'] == $productId) {
+        $_SESSION['checklist'][] = $product;
+        $productFound = true;
+        break;
+      }
+    }  
+    if (!$proudctFound) {
+      echo "Product not found in stock";
+    }
+  }
 ?>
 <!--header-->
 <?php include 'header.php'; ?>
@@ -8,7 +24,7 @@ session_start();
 
 <!--body-->
 <!--product 1 page-->
-<?php include 'stock.php'; ?>
+
 
 <body id="header" class="vh-100 carousel slide" data-bs-ride="carousel" style="padding-top: 104px;">
   <section id="collection" class="py-5">
@@ -61,6 +77,7 @@ session_start();
                <form id="add-to-cart-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form">
                   <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                   <button type="button" class="btn m-2 text-bg-white" onclick="addToCart(<?php echo $product['product_id']; ?>)">Add to Cart</button>
+                  <button type="button" class="btn m-2 text-bg-white" onclick="addToChecklist(<?php echo $product['product_id']; ?>)">Add to Checklist</button>
                </form>
              </div>
            </div>
@@ -128,5 +145,24 @@ function updateCartCount(totalQuantity) {
             }
         };
         xhr.send();
+}
+
+function addToChecklist(productId) {
+
+  var formData = new FormData();
+  formData.append('add_to_checklist', '1');
+  formData.append('product_id', productId);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'add_to_checklist.php', true);
+  //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      alert(response.message);
     }
+  };
+  xhr.send(formData);
+}
+
 </script>

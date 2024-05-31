@@ -45,7 +45,7 @@ if (!isset($_SESSION['cart'])) {
                   </a>
               </button>
               <button type = "button" class = "btn position-relative">
-                  <a href="./my checklist.php">
+                  <a href="./my_checklist.php">
                     <i class = "fa fa-heart" style="color: #2dd796;"></i>
                     <span class = "position-absolute top-0 start-100 translate-middle badge bg-primary">1</span>
                   </a>

@@ -464,17 +464,14 @@ img{
 }
 
 .btn-area {
-    padding: 5px 10px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    background: var(--pink);
-    color: #fff;
-    letter-spacing: 1px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+	bottom: 20px;
+	right: 24px;
+	padding: 10px 25px;
+	background-color: var(--pink);
+	color: white;
+	cursor: pointer;
+	border-radius: 5px;
 }
 
 a {
