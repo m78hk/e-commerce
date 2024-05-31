@@ -46,6 +46,26 @@ body{
     justify-content: flex-end;
 }
 
+/* my_checklist*/
+
+.btn2 {
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(85, 85, 85);
+    padding: 10px 28px;
+    border-radius: 100px;
+    border: 1px solid rgb(85,85,85);
+    font-weight: 500;
+    transition: add 0.5s ease;
+    font-family: var(--sm-font);
+    cursor: pointer;
+}
+
+.btn2:hover {
+    background-color: var(--pink);
+    color: #fff;
+    border-color: var(--pink);
+}
+
 
 
 /* navbar */
@@ -463,16 +483,7 @@ img{
     border: 1px solid #ddd;
 }
 
-.btn-area {
-    position: absolute;
-	bottom: 20px;
-	right: 24px;
-	padding: 10px 25px;
-	background-color: var(--pink);
-	color: white;
-	cursor: pointer;
-	border-radius: 5px;
-}
+
 
 a {
     text-decoration: none;
@@ -494,11 +505,7 @@ a {
     transition: background-color 0.3s ease;
 }
 
-.btn-area:hover {
-	background-color: #76bfb6;
-	color: #fff;
-	font-weight: 600;
-}
+
 
 .unit input {
 	width: 40px;
@@ -548,21 +555,8 @@ a {
 }
 
 /*heart page*/
-.btn-area-cart{
-    position: absolute;
-	bottom: 20px;
-	right: 173px;
-	padding: 10px 25px;
-	background-color: #3a71a9;
-	color: white;
-	cursor: pointer;
-	border-radius: 5px;
-}
-.btn-area-cart:hover {
-	background-color: #76bfb6;
-	color: #fff;
-	font-weight: 600;
-}
+
+
 
 /*maps page*/
 .maps-container{

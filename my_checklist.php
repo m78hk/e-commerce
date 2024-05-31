@@ -1,3 +1,41 @@
+<?php 
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+	if ($_POST['action'] === 'remove_form_checklist' && isset($_POST['product_id'])) {
+		$product_id = $_POST['product_id'];
+		removeFromCart($product_id);
+	} elseif ($_POST['action'] === 'add_to_cart' && isset($_POST['product_id'])) {
+		$product_id = $_POST['product_id'];
+		addToCart($product_id);
+	}
+}
+
+function removeFromChecklist($product_id) {
+	if (isset($_SESSION['checklist'])) {
+		foreach ($_SESSION['checklist'] as $key => $item) {
+			if ($item['product_id'] == $product_id) {
+				unset($_SESSION['checklist'][$key]);
+				return;
+			}
+		}
+	}
+}
+
+function addToCart($product_id) {
+	if (!isset($_SESSION['cart'])) {
+		$_SESSION['cart'] = [];
+	}
+	foreach ($_SESSION['checklist'] as $item) {
+		if ($item['product_id'] == $product_id) {
+			$_SESSION['cart'] [] = ['product_id' => $item['product_id'], 'quantity' => 1];
+			return;
+		}
+	}
+}
+?>
+
+
 <!--header-->
  <?php include 'header.php'; ?>
 <!--end of header-->
@@ -16,8 +54,23 @@
 								<h3><?php echo $item['product_name']; ?></h3>
 								<h4>Price: $<?php echo $item['price']; ?></h4>
 								<p class="unit">Quantity: <input name="" value="1"></p>
-								<p class="btn-area-cart"><i aria-hidden="true" class="fa fa-shopping-cart"></i> <span class="btn2">Add to Cart</span></p>
-								<p class="btn-area"><i aria-hidden="true" class="fa fa-trash"></i> <span class="btn2">Remove</span></p>
+								<form class="add-to-cart-form"  method="post">
+									<input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+									<input type="hidden" name="action" value="add_to_cart">
+									<p class="btn-area-cart">
+										<i aria-hidden="true" class="fa fa-shopping-cart"></i> 
+										<button type="submit" class="btn2">Add to Cart</button>
+									</p>	
+								</form>
+								<form class="remove-from-checklist-form" action="my_checklist.php" method="post">
+									<input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+									<input type="hidden" name="action" value="remove_from_checklist">
+									<p class="btn-area">
+										<i aria-hidden="true" class="fa fa-trash"></i> 
+										<button type="submit" class="btn2">Remove</button>
+									</p>
+								</form>
+								
 							</div>
 						</div>
 					<?php endforeach; ?>
@@ -34,3 +87,4 @@
  <?php include 'footer.php'; ?>
 
 <!--end of contact information, new letter scbscription ,footer-->
+
