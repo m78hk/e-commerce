@@ -1,22 +1,6 @@
 <?php 
-  session_start();
-  include 'stock.php';
+session_start();
 
-  if (isset($_POST['add_to_checklist']) && !empty($_POST['product_id'])) {
-    $productId = $_POST['product_id'];
-
-    $productFound = false;
-    foreach ($products as $product) {
-      if ($product['product_id'] == $productId) {
-        $_SESSION['checklist'][] = $product;
-        $productFound = true;
-        break;
-      }
-    }  
-    if (!$proudctFound) {
-      echo "Product not found in stock";
-    }
-  }
 ?>
 <!--header-->
 <?php include 'header.php'; ?>
@@ -24,7 +8,7 @@
 
 <!--body-->
 <!--product 1 page-->
-
+<?php include 'stock.php'; ?>
 
 <body id="header" class="vh-100 carousel slide" data-bs-ride="carousel" style="padding-top: 104px;">
   <section id="collection" class="py-5">
@@ -46,15 +30,16 @@
       <?php foreach ($products as $product): ?>
       <?php $filterClass = strtolower(str_replace(' ', '-', $product['best_seller_label'])); ?>
       <div class="col-md-6 col-lg-4 col-xl-3 p-2 <?php echo $filterClass; ?>">
-      <div class="collection-img position-relative">
-             <img src="<?php echo $product['image']; ?>" class="small-img">
-             <?php if (!empty($product['label'])): ?>
+      <div class="product-container">
+          <div class="collection-img position-relative">
+            <img src="<?php echo $product['image']; ?>" class="small-img">
+              <?php if (!empty($product['label'])): ?>
                 <span class="position-absolute bg-primary text-white d-flex align-items-center justify-content-center">
-                   <?php echo $product['label']; ?>
+                  <?php echo $product['label']; ?>
                 </span>
-             <?php endif; ?>
-      </div>
-    <div class="text-center">
+              <?php endif; ?>
+          </div>
+      <div class="text-center">
       <div class="rating mt-3">
         <br>
         <?php
@@ -82,10 +67,12 @@
              </div>
            </div>
          </div>
+        </div>
         <?php endforeach; ?>
       </div>
     </div>
     <div id="cart-feedback"></div>
+    <div id="checklist-feedback"></div>
   </section>
 </body>
 
@@ -120,7 +107,7 @@ function addToCart(productId) {
   var formData = new FormData(form);
 
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'cert.php', true);
+  xhr.open('POST', 'update_cart.php', true);
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
@@ -148,26 +135,30 @@ function updateCartCount(totalQuantity) {
 }
 
 function addToChecklist(productId) {
-
-  var formData = new FormData();
-  formData.append('add_to_checklist', '1');
-  formData.append('product_id', productId);
+  //var formData = new FormData();
+  //formData.append('add_to_checklist', '1');
+  //formData.append('product_id', productId);
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'add_to_checklist.php', true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
       if (response.status === 'success') {
+        document.getElementById('checklist-feedback').innerHTML = 'Product added to checklist';
         updateChecklistCount(response.checklistCount);
+      } else if (response.status === 'already_in_checklist') {
+        document.getElementById('checklist-feedback').innerHTML = 'Product already in checklist';
+      } else {
+        document.getElementById('checklist-feedback').innerHTML = 'Failed to add product to checklist';
       }
     }
   };
-  xhr.send(formData);
+  xhr.send('product_id=' + productId);
 }
 
 function updateChecklistCount(count) {
-  document.querySelector('#checklist-count').innerHTML = count;
+  document.getElementById('checklist-count').innerHTML = count;
 }
-
 </script>

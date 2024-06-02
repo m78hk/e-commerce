@@ -20,7 +20,6 @@ if (isset($_POST['product_id'])) {
             $_SESSION['checklist'] = [];
         }
 
-        
         $alreadyInChecklist = false;
         foreach ($_SESSION['checklist'] as $item) {
             if ($item['product_id'] == $productId) {
@@ -34,9 +33,8 @@ if (isset($_POST['product_id'])) {
             $response['status'] = 'success';
         } else {
             $response['status'] = 'already_in_checklist';
-            
         }
-        
+
         $response['checklistCount'] = count($_SESSION['checklist']);
     } else {
         $response['status'] = 'invalid_product_id';
@@ -44,6 +42,6 @@ if (isset($_POST['product_id'])) {
 } else {
     $response['status'] = 'no_product_id';
 }
-
+header('Content-Type: application/json');
 echo json_encode($response);
 ?>

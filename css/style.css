@@ -220,7 +220,7 @@ body{
 
 .collection-img span{
     top: 5px;
-    right: 100px;
+    right: -8px;
     width: 46px;
     height: 46px;
     border-radius: 50%;
@@ -254,7 +254,7 @@ body{
     border-color: #000;
 }
 
-/*---product_2----*/
+/*---product----*/
 img{
     width: 100%;
     display: block;
@@ -382,6 +382,14 @@ img{
     color: #000;
 }
 
+.product-container {
+    background-color: #0de3d5;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom:15px;
+    width: 250px;
+    display: inline-block;
+}
 
 /*login & signup page*/
 .box-area{

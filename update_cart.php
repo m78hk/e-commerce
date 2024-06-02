@@ -13,20 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $productFound = false;
         foreach ($_SESSION['cart'] as &$item) {
             if ($item['product_id'] == $product_id) {
-                $item['quantity'] += 1;
-                $productFound = ture;
+                if (isset($_POST['remove'])) {
+                    unset($item);
+                } elseif (isset($_POST['quantity'])) {
+                    $new_quantity = (int)$_POST['quantity'];
+                    $item['quantity'] = $new_quantity;
+                } else {
+                    $item['quantity'] += 1;
+                }
+                $productFound = true;
                 break;
             }
         }
 
         if (!$productFound) {
             include 'stock.php';
-            foreach ($product as $product) {
+            foreach ($products as $product) {
                 if ($product['product_id'] == $product_id) {
-                    $_SESSION['cart'] [] = [
+                    $_SESSION['cart'][] = [
                         'product_id' => $product_id,
                         'quantity' => 1,
-                        'pricr' => $product['price']
+                        'price' => $product['price']
                     ];
                     break;
                 }
@@ -40,40 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'totalQuantity' => $totalQuantity
         ];
 
-        if (isset($_POST['remove'])) {
-            foreach ($_SESSION['cart'] as $key => $item) {
-                if ($item['product_id'] == $product_id) {
-                    unset($_SESSION['cart'][$key]);
-                    break;
-                }
-            }
-            $_SESSION['cart'] = array_values($_SESSION['cart']);
-        } elseif (isset($_POST['quantity'])) {
-            $new_quantity = (int)$_POST['quantity'];
-            foreach ($_SESSION['cart'] as &$item) {
-                if ($item['product_id'] == $product_id) {
-                    $item['quantity'] = $new_quantity;
-                    break;
-                }
-            }
-        }
-
-        $subtotal = 0;
-        foreach ($_SESSION['cart'] as $item) {
-            $subtotal += $item['price'] * $item['quantity'];
-        }
-
-        $tax = $subtotal * 0.05;
-        $shipping = 15;
-        $total = $subtotal + $tax + $shipping;
-
-        $response = [
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'shipping' => $shipping,
-            'total' => $total,
-        ];
-
         header('Content-Type: application/json');
         echo json_encode($response);
         exit;
@@ -84,8 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $totalQuantity = array_sum(array_column($_SESSION['cart'], 'quantity'));
-    echo $totalQuantity;
+    echo array_sum(array_column($_SESSION['cart'], 'quantity'));
     exit;
 
 } else {
@@ -93,5 +65,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['error' => 'Method not allowed']);
     exit;
 }
-
 ?>
+
