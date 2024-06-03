@@ -391,6 +391,15 @@ img{
     display: inline-block;
 }
 
+.product-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 /*login & signup page*/
 .box-area{
     width: 930px;

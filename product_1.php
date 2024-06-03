@@ -29,7 +29,7 @@ session_start();
       <div class="collection-list mt-4 row gx-0 gy-3">
       <?php foreach ($products as $product): ?>
       <?php $filterClass = strtolower(str_replace(' ', '-', $product['best_seller_label'])); ?>
-      <div class="col-md-6 col-lg-4 col-xl-3 p-2 <?php echo $filterClass; ?>">
+      <div class="col-md-6 col-lg-4 col-xl-3 p-2 d-flex justify-content-center <?php echo $filterClass; ?>">
       <div class="product-container">
           <div class="collection-img position-relative">
             <img src="<?php echo $product['image']; ?>" class="small-img">
@@ -56,7 +56,7 @@ session_start();
           }
         ?>
     </div>
-             <p class="text-capitalize my-1"><?php echo $product['product_name']; ?></p>
+             <p class="text-capitalize my-1 product-name" style=" padding: 2px; border-radius: 4px; display: inline-block; width: auto;"><?php echo $product['product_name']; ?></p>
              <span class="fw-bold">$<?php echo $product['price']; ?></span>
              <div class="text-center">
                <form id="add-to-cart-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form">
