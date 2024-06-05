@@ -2,35 +2,69 @@
 session_start();
 include 'database.php';
 
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user']['uid'])) {
 	header('Location: login.php');
-	exit;
+	exit();
 }
 
-$user_id = $_SESSION['user']['id'];
+$user_id = $_SESSION['user']['uid'];
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	if (isset($_POST['item']) && !empty(trim($_POST['item']))) {
-		$item = trim($_POST['item']);
-		$stmt = $pdo->prepare('INSERT INTO checklist (user_id, item) VALUES (?, ?)');
-		$stmt->execute([$user_id, $item]);
-	} elseif (isset($_POST['completed_id'])) {
-		$completed_id = $_POST['completed_id'];
-		$stmt = $pdo->prepare('UPDATE checklist SET completed = NOT completed WHERE id = ? AND user_id = ?');
-		$stmt->execute([$completed_id, $user_id]);
-	} elseif (isset($_POST['product_id']) && $_POST['action'] === 'remove_from_checklist') {
-		$product_id = $_POST['product_id'];
-		$stmt = $pdo->prepare('DELETE FROM checklist WHERE id = ? AND user_id = ?');
-		$stmt->execute([$product_id, $user_id]);
+
+	$product_id = null;
+	$completed_id = null;
+	$action = isset($_POST['action']) ? $_POST['action'] : '';
+
+	error_log('POST data: ' . print_r($_POST, true));
+    error_log('Action: ' . $action);
+
+
+	if (isset($_POST['product_id']) && $action === 'add_to_checklist') {
+        $product_id = trim($_POST['product_id']);
+        $stmt = $pdo->prepare('INSERT INTO checklist (user_id, product_id) VALUES (?, ?)');
+		if ($stmt->execute([$user_id, $product_id])) {
+            error_log('Product added to checklist: ' . $product_id);
+        } else {
+            error_log('Failed to add product to checklist: ' . $product_id);
+		}
+    
+   
+    } elseif (isset($_POST['product_id']) && $action === 'remove_from_checklist') {
+        $product_id = $_POST['product_id'];
+        $stmt = $pdo->prepare('DELETE FROM checklist WHERE product_id = ? AND user_id = ?');
+		if ($stmt->execute([$product_id, $user_id])) {
+			if (isset($_SESSION['checklist'])) {
+                foreach ($_SESSION['checklist'] as $key => $item) {
+                    if ($item['product_id'] == $product_id) {
+                        unset($_SESSION['checklist'][$key]);
+                    }
+                }
+                $_SESSION['checklist'] = array_values($_SESSION['checklist']);
+            }
+            error_log('Product removed from checklist: ' . $product_id);
+        } else {
+            error_log('Failed to remove product from checklist: ' . $product_id);
+        }
+    
+   
+    } elseif (isset($_POST['completed_id'])) {
+        $completed_id = $_POST['completed_id'];
+        $stmt = $pdo->prepare('UPDATE checklist SET completed = NOT completed WHERE product_id = ? AND user_id = ?');
+		if ($stmt->execute([$completed_id, $user_id])) {
+            error_log('Product completed status updated: ' . $completed_id);
+        } else {
+            error_log('Failed to update product completed status: ' . $completed_id);
+        }
 	}
 }
 
-$stmt = $pdo->prepare('SELECT * FROM checklist WHERE user_id = ?');
+$stmt = $pdo->prepare('SELECT checklist.id, checklist.product_id, products.product_name, products.price, 
+	products.image FROM checklist LEFT JOIN products ON checklist.product_id = products.product_id WHERE checklist.user_id = ?');
 $stmt->execute([$user_id]);
-$items = $stmt->fetchAll();
+$items= $stmt->fetchAll();
+//$items = $_SESSION['checklist'];
 
-$_SESSION['checklist'] = $items;
 
 ?>
 

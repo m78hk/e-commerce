@@ -70,7 +70,7 @@ $products = $stmt->fetchAll();
                   <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                   <button type="button" class="btn m-2 text-bg-white" onclick="addToCart(<?php echo $product['product_id']; ?>)">Add to Cart</button>
                </form>
-               <form id="add-to-checklist-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form" method="post" action="add_to_checklist.php">
+               <form id="add-to-checklist-form-<?php echo $product['product_id']; ?>" class="add-to-checklist-form" method="post" action="add_to_checklist.php">
                   <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                   <button type="button" class="btn m-2 text-bg-white" onclick="addToChecklist(<?php echo $product['product_id']; ?>)">Add to Checklist</button>
                </form>
@@ -153,6 +153,7 @@ function addToChecklist(productId) {
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
+      console.log(xhr.responseText)
       var response = JSON.parse(xhr.responseText);
       if (response.status === 'success') {
         document.getElementById('checklist-feedback').innerHTML = 'Product added to checklist';
