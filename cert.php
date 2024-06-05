@@ -32,14 +32,18 @@ function updateCart($product_id, $quantity) {
 }
 
 function removeFromCart($product_id) {
-    foreach ($_SESSION['cart'] as $key => $item) {
+    if (isset($_POST['product_id'])){
+        $product_id = $_POST['product_id'];
+            foreach ($_SESSION['cart'] as $key => $item) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
+            $_SESSION['cart_quantity'] = getCartQuantity();
             echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
             exit;
+            }
         }
     }
-    echo json_encode(['status' => 'error', 'massage' => 'Product not found']);
+    echo json_encode(['status' => 'error', 'message' => 'Product not found']);
 }
 
 
@@ -137,7 +141,9 @@ include 'header.php';
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
+                    location.reload();
                     updateCartQuantity(response.cartQuantity);
+                    updateCartIconQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to update cart');
                 }
@@ -152,9 +158,12 @@ include 'header.php';
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log(xhr.responseText);
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
+                    location.reload();
                     updateCartQuantity(response.cartQuantity);
+                    updateCartIconQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to remove from cart');
                 }
@@ -164,7 +173,10 @@ include 'header.php';
     }
 
     function updateCartQuantity(quantity) {
-        document.querySelector('.nav-btns .badge.bg-primary').textContent = quantity;
+       
+        var cartIconQuantityElement = document.querySelector('.nav-btns .badge.bg-primary');
+   
+        cartIconQuantityElement.textContent = quantity;
     }
 
     </script>

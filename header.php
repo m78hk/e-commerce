@@ -1,5 +1,6 @@
 <?php 
 
+
 include 'database.php';
 
 $cartQuantity = isset($_SESSION['cart_quantity']) ? $_SESSION['cart_quantity'] : 0;

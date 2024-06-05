@@ -22,7 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user && md5($password) === $user['password']) {
             $_SESSION['user'] = $user;
-            header('Location: index.php');
+            $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
+            unset($_SESSION['redirect_to']);
+            header('Location: $redirect_to');
             exit();
         } else {
             $error = 'Invalid email or password.';
