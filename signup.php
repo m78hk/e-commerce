@@ -26,14 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user) {
             $error = 'Email already registered.';
         } else {
-            $stmt = $pde->prepare('SELECT * FROM tb_accounts WHERE username = ?');
+            $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE username = ?');
             $stmt->execute([$username]);
             $user = $stmt->fetch();
 
             if ($user) {
                 $error = 'Username already taken.';
             } else {
-                $hashedPassword = md5($password, PASSWORD_DEFAULT);
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password) VALUES (?, ?, ?)');
                 $stmt->execute([$username, $email, $hashedPassword]);
                 header('Location: login.php');
