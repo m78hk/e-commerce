@@ -20,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        if ($user && md5($password) === $user['password']) {
+        if ($user && password_verify ($password, $user['password'])) {
             $_SESSION['user'] = $user;
             $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
             unset($_SESSION['redirect_to']);
-            header('Location: $redirect_to');
+            header("Location: $redirect");
             exit();
         } else {
             $error = 'Invalid email or password.';
