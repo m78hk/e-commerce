@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'stock.php';
+include 'database.php';
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -8,65 +8,69 @@ if (!isset($_SESSION['cart'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['product_id'])) {
+        $product_id = $_POST['product_id'];
         if (isset($_POST['quantity'])) {
-            $product_id = $_POST['product_id'];
             $quantity = $_POST['quantity'];
             updateCart($product_id, $quantity);
         } elseif (isset($_POST['remove']) && $_POST['remove'] === 'true') {
-            $product_id = $_POST['product_id'];
             removeFromCart($product_id);
         } else {
-            $product_id = $_POST['product_id'];
             addToCart($product_id);
-
         }
     }
 }
 
 function updateCart($product_id, $quantity) {
     foreach ($_SESSION['cart'] as &$item) {
-        if ($item['product_id'] == $product_id) {
+        if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             $item['quantity'] = $quantity;
-            echo json_encode(['status' => 'success']);
+            echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
             exit;
         }
     }
-    echo json_encode(['status' => 'error']);
+    echo json_encode(['status' => 'error', 'message' => 'Product not found']);
 }
 
 function removeFromCart($product_id) {
     foreach ($_SESSION['cart'] as $key => $item) {
-        if ($item['product_id'] == $product_id) {
+        if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
-            echo json_encode(['status' => 'success']);
+            echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
             exit;
         }
     }
-    echo json_encode(['status' => 'error']);
+    echo json_encode(['status' => 'error', 'massage' => 'Product not found']);
 }
 
 
 function addToCart($product_id) {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
     foreach ($_SESSION['cart'] as $item) {
-        if ($item['product_id'] == $product_id) {
+        if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             echo json_encode(['status' => 'error', 'message' => 'Product already in cart']);
             return;
         }
     }
     $_SESSION['cart'][] = ['product_id' => $product_id, 'quantity' => 1];
-    echo json_encode(['status' => 'success']);
+    echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
+}
+
+function getCartQuantity() {
+    return array_sum(array_column($_SESSION['cart'], 'quantity'));
+}
+
+$subtotal = 0;
+$products = [];
+
+$stmt = $pdo->query('SELECT * FROM products');
+while ($row = $stmt->fetch()) {
+    $products[$row['product_id']] = $row;
 }
 
 
-$subtotal = 0;
 foreach ($_SESSION['cart'] as $item) {
-    foreach ($products as $product) {
-        if ($product['product_id'] == $item['product_id']) {
-            $subtotal += $product['price'] * $item['quantity'];
-        }
+    if (isset($item['product_id']) && isset($products[$item['product_id']])) {
+        $product = $products[$item['product_id']];
+        $subtotal += $product['price'] * $item['quantity'];
     }
 }
 
@@ -83,11 +87,11 @@ include 'header.php';
         <h1>Shopping Cart</h1>
         <div class="cart-box">
             <div class="shop">
-                <?php
-                if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+            <?php
+                if (!empty($_SESSION['cart'])) {
                     foreach ($_SESSION['cart'] as $item) {
-                        foreach ($products as $product) {
-                            if ($product['product_id'] == $item['product_id']) {
+                        if (isset($item['product_id']) && isset($products[$item['product_id']]))  {
+                            $product = $products[$item['product_id']];
                 ?>
                 <div class="box">
                     <img src="<?php echo htmlspecialchars($product['image']); ?>">
@@ -104,7 +108,6 @@ include 'header.php';
                     </div>
                 </div>
                 <?php
-                            }
                         }
                     }
                 } else {
@@ -134,7 +137,7 @@ include 'header.php';
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
-                    location.reload();
+                    updateCartQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to update cart');
                 }
@@ -151,7 +154,7 @@ include 'header.php';
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
-                    location.reload();
+                    updateCartQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to remove from cart');
                 }
@@ -159,6 +162,11 @@ include 'header.php';
         };
         xhr.send('product_id=' + productId + '&remove=true');
     }
+
+    function updateCartQuantity(quantity) {
+        document.querySelector('.nav-btns .badge.bg-primary').textContent = quantity;
+    }
+
     </script>
 </body>
 <!--end of header-->

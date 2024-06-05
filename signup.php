@@ -1,53 +1,53 @@
 <?php
-
-/*--header--*/
-  include 'header.php'; 
-/*--end of header--*/
-
-$users = [
-    ['name' => 'Mr Test', 'email' => 'mrtest@example.com', 'password' => password_hash('password', PASSWORD_DEFAULT)],
-];
+session_start();
+include 'database.php';
 
 $error = '';
-$success = '';
-
-$name = '';
+$username = '';
 $email = '';
 $password = '';
 $confirm_password = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name']);
+    $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
 
-    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = 'All fields are required.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Invalid email format.';
     } elseif ($password !== $confirm_password) {
-        $error = 'Password do not match.';
+        $error = 'Passwords do not match.';
     } else {
-        $userExists = false;
-        foreach ($users as $user) {
-            if ($user['email'] === $email) {
-                $userExists = true;
-                break;
-            }
-        }
+        $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-        if ($userExists) {
+        if ($user) {
             $error = 'Email already registered.';
         } else {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $users[] = ['name' => $name, 'email' => $email, 'password' => $hashedPassword];
-            header('Location: login.php');
-            exit();
+            $stmt = $pde->prepare('SELECT * FROM tb_accounts WHERE username = ?');
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                $error = 'Username already taken.';
+            } else {
+                $hashedPassword = md5($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password) VALUES (?, ?, ?)');
+                $stmt->execute([$username, $email, $hashedPassword]);
+                header('Location: login.php');
+                exit();
+            }
         }
     }
 }
+
 ?>
+
+<!--header-->
+<?php include 'header.php'; ?>
+<!--end of header-->
 
 <!--body-->
 <body id="body" class="vh-100 carousel slide " data-bs-ride ="carousel" style="padding-top: 104px;">
@@ -73,16 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    <?php endif; ?>
                    <form method="post" action="signup.php">
                        <div class="input-group mb-3">
-                           <input type="text" name="name" class="form-control form-control-lg bg-light fs-6" placeholder="Name" value="<?php echo htmlspecialchars($name); ?>">
+                           <input type="text" name="username" class="form-control form-control-lg bg-light fs-6" placeholder="Username" value="<?php echo htmlspecialchars($username); ?>" required>
                        </div>
                        <div class="input-group mb-3">
-                           <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address" value="<?php echo htmlspecialchars($email); ?>">
+                           <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address" value="<?php echo htmlspecialchars($email); ?>" required>
                        </div>
                        <div class="input-group mb-1">
-                           <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password">
+                           <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password" required>
                        </div>
                        <div class="input-group mb-1">
-                        <input type="password"  name="confirm_password"class="form-control form-control-lg bg-light fs-6" placeholder="Confirm Password">
+                        <input type="password"  name="confirm_password"class="form-control form-control-lg bg-light fs-6" placeholder="Confirm Password" required>
                        </div>
                        <div class="input-group mb-5 d-flex justify-content-between">
                            <div class="forgot">
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            </div>
                        </div>
                        <div class="input-group mb-3">
-                           <button class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
+                           <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
                        </div>
                    </form>
                </div>

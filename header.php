@@ -1,5 +1,10 @@
 <?php 
-session_start();
+
+include 'database.php';
+
+$cartQuantity = isset($_SESSION['cart_quantity']) ? $_SESSION['cart_quantity'] : 0;
+
+
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -7,8 +12,10 @@ if (!isset($_SESSION['cart'])) {
 
 if (!isset($_SESSION['checklist'])) {
     $_SESSION['checklist'] = [];
-
 }
+
+
+
 ?>
 
 <!doctype html>
@@ -41,7 +48,7 @@ if (!isset($_SESSION['checklist'])) {
               <button type = "button" class = "btn position-relative">
                   <a href="./cert.php">
                     <i class="fa fa-shopping-cart" style="color: #2dd796;"></i>
-                    <span id="cart-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary"><?php echo array_sum(array_column($_SESSION['cart'], 'quantity'));?></span>
+                    <span id="cart-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary"><?php echo $cartQuantity;?></span>
                   </a>
               </button>
               <button type = "button" class = "btn position-relative">

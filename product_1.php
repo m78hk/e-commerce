@@ -1,5 +1,12 @@
 <?php 
+
 session_start();
+include 'database.php';
+
+$query = "SELECT * FROM products";
+$stmt = $pdo->query($query);
+
+$products = $stmt->fetchAll();
 
 ?>
 <!--header-->
@@ -8,7 +15,7 @@ session_start();
 
 <!--body-->
 <!--product 1 page-->
-<?php include 'stock.php'; ?>
+
 
 <body id="header" class="vh-100 carousel slide" data-bs-ride="carousel" style="padding-top: 104px;">
   <section id="collection" class="py-5">
@@ -59,9 +66,12 @@ session_start();
              <p class="text-capitalize my-1 product-name" style=" padding: 2px; border-radius: 4px; display: inline-block; width: auto;"><?php echo $product['product_name']; ?></p>
              <span class="fw-bold">$<?php echo $product['price']; ?></span>
              <div class="text-center">
-               <form id="add-to-cart-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form">
+               <form id="add-to-cart-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form" method="post" action="update_cart.php">
                   <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                   <button type="button" class="btn m-2 text-bg-white" onclick="addToCart(<?php echo $product['product_id']; ?>)">Add to Cart</button>
+               </form>
+               <form id="add-to-checklist-form-<?php echo $product['product_id']; ?>" class="add-to-cart-form" method="post" action="add_to_checklist.php">
+                  <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                   <button type="button" class="btn m-2 text-bg-white" onclick="addToChecklist(<?php echo $product['product_id']; ?>)">Add to Checklist</button>
                </form>
              </div>
@@ -135,9 +145,8 @@ function updateCartCount(totalQuantity) {
 }
 
 function addToChecklist(productId) {
-  //var formData = new FormData();
-  //formData.append('add_to_checklist', '1');
-  //formData.append('product_id', productId);
+  var form = document.getElementById('add-to-checklist-form-' + productId);
+  var formData = new FormData(form);
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'add_to_checklist.php', true);

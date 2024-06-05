@@ -1,3 +1,12 @@
+<?php
+ session_start();
+ include 'database.php'; 
+ 
+ ?>
+
+
+
+
 <!--header-->
 <?php include 'header.php'; ?>
 <!--end of header-->

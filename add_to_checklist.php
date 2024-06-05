@@ -1,21 +1,17 @@
 <?php
 session_start();
-include 'stock.php';
+include 'database.php'; 
 
 $response = ['status' => 'error', 'checklistCount' => 0];
 
 if (isset($_POST['product_id'])) {
     $productId = $_POST['product_id'];
 
-    $productFound = false;
-    foreach ($products as $product) {
-        if ($product['product_id'] == $productId) {
-            $productFound = true;
-            break;
-        }
-    }
+    $stmt = $pdo->prepare('SELECT * FROM products WHERE product_id = ?');
+    $stmt->execute([$productId]);
+    $product = $stmt->fetch();
 
-    if ($productFound) {
+    if ($product) {
         if (!isset($_SESSION['checklist'])) {
             $_SESSION['checklist'] = [];
         }
@@ -31,17 +27,19 @@ if (isset($_POST['product_id'])) {
         if (!$alreadyInChecklist) {
             $_SESSION['checklist'][] = $product;
             $response['status'] = 'success';
+
+            // 更新清單數量
+            $response['checklistCount'] = count($_SESSION['checklist']);
         } else {
             $response['status'] = 'already_in_checklist';
         }
-
-        $response['checklistCount'] = count($_SESSION['checklist']);
     } else {
         $response['status'] = 'invalid_product_id';
     }
 } else {
     $response['status'] = 'no_product_id';
 }
+
 header('Content-Type: application/json');
 echo json_encode($response);
 ?>
