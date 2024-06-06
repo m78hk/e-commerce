@@ -1,11 +1,7 @@
 <?php 
 
-
 include 'database.php';
-
-$cartQuantity = isset($_SESSION['cart_quantity']) ? $_SESSION['cart_quantity'] : 0;
-
-
+include 'functions.php';
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -16,6 +12,10 @@ if (!isset($_SESSION['checklist'])) {
 }
 
 
+
+$cartQuantity = getCartQuantity();
+
+//$cartQuantity = isset($_SESSION['cart_quantity']) ? $_SESSION['cart_quantity'] : 0;
 
 ?>
 

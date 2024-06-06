@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'database.php';
+include 'functions.php';
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -24,7 +25,8 @@ function updateCart($product_id, $quantity) {
     foreach ($_SESSION['cart'] as &$item) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             $item['quantity'] = $quantity;
-            echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
+            $_SESSION['cart_quantity'] = getCartQuantity();
+            echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
             exit;
         }
     }
@@ -32,15 +34,12 @@ function updateCart($product_id, $quantity) {
 }
 
 function removeFromCart($product_id) {
-    if (isset($_POST['product_id'])){
-        $product_id = $_POST['product_id'];
             foreach ($_SESSION['cart'] as $key => $item) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
             $_SESSION['cart_quantity'] = getCartQuantity();
-            echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
+            echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
             exit;
-            }
         }
     }
     echo json_encode(['status' => 'error', 'message' => 'Product not found']);
@@ -54,8 +53,28 @@ function addToCart($product_id) {
             return;
         }
     }
-    $_SESSION['cart'][] = ['product_id' => $product_id, 'quantity' => 1];
-    echo json_encode(['status' => 'success', 'cartQuantity' => getCartQuantity()]);
+
+
+     
+        global $pdo;
+        $stmt = $pdo->prepare('SELECT * FROM products WHERE product_id = ?');
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch();
+    
+        if ($product) {
+         
+            $_SESSION['cart'][] = [
+                'product_id' => $product['product_id'],
+                'product_name' => $product['product_name'],
+                'price' => $product['price'],
+                'image' => $product['image'],
+                'quantity' => 1
+            ];
+            $_SESSION['cart_quantity'] = getCartQuantity();
+            echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Product not found']);
+        }
 }
 
 function getCartQuantity() {
@@ -142,7 +161,7 @@ include 'header.php';
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
                     location.reload();
-                    updateCartQuantity(response.cartQuantity);
+                    //updateCartQuantity(response.cartQuantity);
                     updateCartIconQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to update cart');
@@ -162,7 +181,7 @@ include 'header.php';
                 var response = JSON.parse(xhr.responseText);
                 if (response.status === 'success') {
                     location.reload();
-                    updateCartQuantity(response.cartQuantity);
+                    //updateCartQuantity(response.cartQuantity);
                     updateCartIconQuantity(response.cartQuantity);
                 } else {
                     alert('Failed to remove from cart');

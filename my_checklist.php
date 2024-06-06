@@ -48,22 +48,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     
    
-    } elseif (isset($_POST['completed_id'])) {
-        $completed_id = $_POST['completed_id'];
-        $stmt = $pdo->prepare('UPDATE checklist SET completed = NOT completed WHERE product_id = ? AND user_id = ?');
-		if ($stmt->execute([$completed_id, $user_id])) {
-            error_log('Product completed status updated: ' . $completed_id);
+    } elseif (isset($_POST['product_id']) && $action === 'add_to_cart') {
+        $product_id = $_POST['product_id'];
+        $stmt = $pdo->prepare('SELECT * FROM products WHERE product_id = ?');
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch();
+
+		if ($product) {
+            if (!isset($_SESSION['cart'])) {
+                $_SESSION['cart'] = [];
+            }
+
+           
+            $_SESSION['cart'][] = $product;
+            error_log('Product added to cart: ' . $product_id);
+
+			echo json_encode(['status' => 'success', 'cartQuantity' => count($_SESSION['cart'])]);
         } else {
-            error_log('Failed to update product completed status: ' . $completed_id);
+            error_log('Failed to add product to cart: ' . $product_id);
+			echo json_encode(['status' => 'error']);
         }
+		exit;
 	}
 }
+
+		function getCartQuantity() {
+    		if (!isset($_SESSION['cart'])) {
+        		return 0;
+    		}
+    		return count($_SESSION['cart']);
+		}
 
 $stmt = $pdo->prepare('SELECT checklist.id, checklist.product_id, products.product_name, products.price, 
 	products.image FROM checklist LEFT JOIN products ON checklist.product_id = products.product_id WHERE checklist.user_id = ?');
 $stmt->execute([$user_id]);
 $items= $stmt->fetchAll();
-//$items = $_SESSION['checklist'];
+
 
 
 ?>
@@ -87,7 +107,7 @@ $items= $stmt->fetchAll();
 								<h3><?php echo htmlspecialchars ($item['product_name']); ?></h3>
 								<h4>Price: $<?php echo htmlspecialchars ($item['price']); ?></h4>
 								<p class="unit">Quantity: <input name="" value="1"></p>
-								<form class="add-to-cart-form"  method="post">
+								<form class="add-to-cart-form"  onsubmit="addToCart(event, '<?php echo htmlspecialchars($item['product_id']); ?>')">
 									<input type="hidden" name="product_id" value="<?php echo htmlspecialchars ($item['product_id']); ?>">
 									<input type="hidden" name="action" value="add_to_cart">
 									<p class="btn-area-cart">
@@ -120,3 +140,34 @@ $items= $stmt->fetchAll();
 
 <!--end of contact information, new letter scbscription ,footer-->
 
+<script>
+    
+
+function addToCart(event, productId) {
+    event.preventDefault();
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'my_checklist.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.status === 'success') {
+                updateCartIconQuantity(response.cartQuantity);
+                location.reload();
+            } else {
+                alert('Failed to add to cart');
+            }
+        }
+    };
+    xhr.send('product_id=' + productId + '&action=add_to_cart');
+}
+
+function updateCartIconQuantity(quantity) {
+    var cartIconQuantityElement = document.querySelector('.nav-btns .badge.bg-primary');
+    cartIconQuantityElement.textContent = quantity;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+	updateCartIconQuantity(<?php echo getCartQuantity(); ?>);
+});
+</script>
