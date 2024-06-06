@@ -15,8 +15,6 @@ if (!isset($_SESSION['checklist'])) {
 
 $cartQuantity = getCartQuantity();
 
-//$cartQuantity = isset($_SESSION['cart_quantity']) ? $_SESSION['cart_quantity'] : 0;
-
 ?>
 
 <!doctype html>

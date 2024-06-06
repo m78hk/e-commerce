@@ -4,9 +4,6 @@
  
  ?>
 
-
-
-
 <!--header-->
 <?php include 'header.php'; ?>
 <!--end of header-->
@@ -20,12 +17,12 @@
     <div class = "text-center carousel-item active">
         <h2 class = "text-capitalize text-white">best collection</h2>
         <h1 class = "text-uppercase py-2 fw-bold text-white">new arrivals</h1>
-        <a href = "./product_1.html" class = "btn mt-3 text-uppercase text-white">shop now</a>
+        <a href = "./product_1.php" class = "btn mt-3 text-uppercase text-white">shop now</a>
     </div>
   <div class = "text-center carousel-item">
       <h2 class = "text-capitalize text-white">best price & offer</h2>
       <h1 class = "text-uppercase py-2 fw-bold text-white">new season</h1>
-      <a href = "./product_2.html" class = "btn mt-3 text-uppercase text-white">buy now</a>
+      <a href = "./product_2.php" class = "btn mt-3 text-uppercase text-white">buy now</a>
    </div>
   </div>
   <button class = "carousel-control-prev" type = "button" data-bs-target="#header" data-bs-slide = "prev">

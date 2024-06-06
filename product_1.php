@@ -39,7 +39,7 @@ $products = $stmt->fetchAll();
       <div class="col-md-6 col-lg-4 col-xl-3 p-2 d-flex justify-content-center <?php echo $filterClass; ?>">
       <div class="product-container">
           <div class="collection-img position-relative">
-            <img src="<?php echo $product['image']; ?>" class="small-img">
+            <img src="data:image/jpeg;base64,<?php echo base64_encode($product['image']); ?>" class="small-img">
               <?php if (!empty($product['label'])): ?>
                 <span class="position-absolute bg-primary text-white d-flex align-items-center justify-content-center">
                   <?php echo $product['label']; ?>
