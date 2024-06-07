@@ -117,7 +117,7 @@ include 'header.php';
                             $product = $products[$item['product_id']];
                 ?>
                 <div class="box">
-                    <img src="<?php echo htmlspecialchars($product['image']); ?>">
+                    <img src="data:image/jpeg;base64,<?php echo base64_encode($product['image']); ?>">
                     <div class="content">
                         <h3><?php echo htmlspecialchars($product['product_name']); ?></h3>
                         <h4>Price: $<?php echo htmlspecialchars($product['price']); ?></h4>

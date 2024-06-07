@@ -13,7 +13,7 @@ $user_id = $_SESSION['user']['uid'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	$product_id = null;
-	$completed_id = null;
+	//$completed_id = null;
 	$action = isset($_POST['action']) ? $_POST['action'] : '';
 
 	error_log('POST data: ' . print_r($_POST, true));
@@ -102,7 +102,7 @@ $items= $stmt->fetchAll();
 				<?php if (isset($_SESSION['checklist']) && !empty($_SESSION['checklist'])): ?>
 					<?php foreach ($_SESSION['checklist'] as $item): ?>
 						<div class="box">
-							<img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars ($item['product_name']); ?>">
+						<img src="data:image/jpeg;base64,<?php echo base64_encode($item['image']); ?>">
 							<div class="content">
 								<h3><?php echo htmlspecialchars ($item['product_name']); ?></h3>
 								<h4>Price: $<?php echo htmlspecialchars ($item['price']); ?></h4>
