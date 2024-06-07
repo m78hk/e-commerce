@@ -108,9 +108,9 @@ if (isset($_GET['logout'])) {
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       PRODUCT
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu product-dropdown-menu">
                       <li><a class="dropdown-item" href= "./product_1.php">Supermarket</a></li>
-                      <li><a class="dropdown-item" href= "./product_2.php">Electronic product</a></li>
+                      <!--<li><a class="dropdown-item" href= "./product_2.php">Electronic product</a></li>-->
                    </ul>
                  </li>
               </ul>
@@ -176,7 +176,10 @@ if (isset($_GET['logout'])) {
     function openAuthModal() {
         var authModal = new bootstrap.Modal(document.getElementById('authModal'));
         authModal.show();
-}
+    }
+
+
+
     </script>
   </body>
 </html>
