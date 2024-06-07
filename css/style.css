@@ -15,7 +15,7 @@ body{
     background-color: var(--pink)!important;
 }
 
-.btn:not(.nav-btns button){
+.btn:not(.nav-btns button):not(.user-btn){
     background-color: rgba(0, 0, 0, 0);
     color: rgb(85, 85, 85);
     padding:10px 28px;
@@ -25,16 +25,20 @@ body{
     transition: all .5s ease;
 }
 
-.btn:hover:not(.nav-btns button) {
+.btn:not(.nav-btns button):not(.user-btn):hover {
     background-color: rgb(85, 85, 85);
     color: #fff;
 }
 
-.btn:not(.nav-btns button):hover{
+.btn:not(.nav-btns button):not(.user-btn):hover{
     background-color: var(--pink);
-    color: 0;
+    color: #fff;
     border-color:var(--pink);
 }
+
+
+
+
 
 
 /*text color*/
@@ -637,6 +641,7 @@ a {
 
 /*media queries*/
 @media(min-width: 992px){
+
     .nav-item{
         border-bottom:none;
     }

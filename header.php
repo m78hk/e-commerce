@@ -14,6 +14,14 @@ if (!isset($_SESSION['checklist'])) {
 
 
 $cartQuantity = getCartQuantity();
+$isLoggedIn = isset($_SESSION['user']);
+
+if (isset($_GET['logout'])) {
+  session_unset();
+  session_destroy();
+  header('Location: index.php');
+  exit;
+}
 
 ?>
 
@@ -34,17 +42,31 @@ $cartQuantity = getCartQuantity();
     <title>ABC SHOPPING MALL</title>
   </head>
   <body>
-
 <!--navbar-->
     <nav class = "navbar navbar-expand-lg navbar-light bg-white py-4 fixed-top">
       <div class = "container">
           <a class = "navbar-brand d-flex justify-content-between align-items-center order-lg-0" href = "index.php">
               <img src = "./img/shopping_bag.png" alt = "site icon">
-              <span class = "text-uppercase fw-lighter ms-2">ABC SHOPPING MALL</span>
+              <span class = "text-uppercase fw-lighter ms-1">ABC SHOPPING MALL</span>
           </a>
 
-          <div class = "order-lg-2 nav-btns">
-              <button type = "button" class = "btn position-relative">
+          <div class = "order-lg-2 nav-btns d-flex justify-content-end align-items-center">
+            <?php if (!$isLoggedIn): ?>
+              <button type="button" onclick="openAuthModal()" class="user-btn" style="background-color: rgba(0, 0, 0, 0); border: none;">
+                <i class="fa fa-user user-icon" style="color: #2dd796;"></i>
+              </button>
+            <?php else: ?>
+              <div class="dropdown">
+                <a href="./auth.php" class="dropdown-toggle" id="userdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-user user-icon" style="color: #2dd796;"></i><?php echo htmlspecialchars($_SESSION['user']['username']); ?>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                  <li><a class="dripdown-item" href="?logout=true">Logout</a></li>
+                </ul>
+              </div>
+            <?php endif; ?> 
+
+              <button type="button" class="btn position-relative">
                   <a href="./cert.php">
                     <i class="fa fa-shopping-cart" style="color: #2dd796;"></i>
                     <span id="cart-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary"><?php echo $cartQuantity;?></span>
@@ -74,12 +96,14 @@ $cartQuantity = getCartQuantity();
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./index.php">home</a>
                   </li>
+                  
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./login.php">login</a>
                   </li>
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./signup.php">SignUp</a>
                   </li>
+                  
                   <li class="nav-item dropdown px-2 py-2 border-0">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       PRODUCT
@@ -95,6 +119,44 @@ $cartQuantity = getCartQuantity();
   </nav>
 <!--end of navbar-->
 
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="authModalLabel">Login / Register</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Login Form -->
+        <form id="loginForm" action="login.php" method="post">
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="loginEmail" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <hr>
+        <!-- Register Form -->
+        <form id="registerForm" action="signup.php" method="post">
+          <div class="mb-3">
+            <label for="registerEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="registerEmail" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="registerPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="registerPassword" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -109,5 +171,12 @@ $cartQuantity = getCartQuantity();
 
 <!--custom js-->
 <script src="./js/style.js"></script>
+
+<script>
+    function openAuthModal() {
+        var authModal = new bootstrap.Modal(document.getElementById('authModal'));
+        authModal.show();
+}
+    </script>
   </body>
 </html>
