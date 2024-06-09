@@ -1,7 +1,7 @@
 <?php
 
-session_start();
 include 'database.php';
+
 
 $loginError = '';
 $signupError = '';
@@ -57,14 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
         if ($user) {
             $signupError = 'Email already registered.';
         } else {
-            $stmt = $pdo->prepare('ERLECT * FROM tb_accounts WHERE username = ?');
+            $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE username = ?');
             $stmt->execute([$username]);
             $user = $stmt->fetch();
 
             if ($user) {
                 $signupError = 'Username already taken.';
             } else {
-                $hashePassword = password_hash($password, PASSWORD_DEFAULT);
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password) VALUES (?, ?, ?)');
                 $stmt->execute([$username, $email, $hashedPassword]);
                 header('Location: auth.php');
@@ -84,12 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
         <meta name="viewport" content="Width=device-width, initial-scale=1">
         <!-- Include Bootstrap CSS -->
          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-         <style>
-            .auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1050;}
-            .auth-content { background: white; padding: 20px; border-radius: 8px; max-width: 900px; width: 100%; display: flex; }
-            .auth-left, .auth-right { flex: 1; padding: 20px; }
-            .close_btn { position: absolute; top: 10px; right: 10px; cursor: pointer; }
-         </style>
     </head>
     <body>
         <div class="auth-modal d-flex" id="authModal">
@@ -99,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
                 <div class="auth-left">
                     <h2>Login</h2>
                     <?php if ($loginError): ?>
-                        <div class="alert alert-danger"><?php echo htmlspecialcharts($loginError) ?></div>
+                        <div class="alert alert-danger"><?php echo htmlspecialchars($loginError) ?></div>
                     <?php endif; ?>
                     <form method="post" action="auth.php">
                         <input type="hidden" name="login" value="1">
@@ -121,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
                     <?php if ($signupError):?>
                         <div class="alert alert-danger"><?php echo htmlspecialchars($signupError);?></div>
                     <?php endif; ?>
-                    <form metbod="post" action="auth.php">
+                    <form method="post" action="auth.php">
                         <input type="hidden" name="signup" value="1">
                         <div class="mb-3">
                             <label for="signupUsername" class="form-label">Username</label>
@@ -148,9 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function openAuthModal() {
-            document.getElementById('authModal').style.display = 'flex';
+            var authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            authModal.show();
         }
-
     </script>
     </body>
 </html>

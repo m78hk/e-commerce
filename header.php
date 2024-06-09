@@ -23,6 +23,72 @@ if (isset($_GET['logout'])) {
   exit;
 }
 
+$error = '';
+$username = '';
+$email = '';
+$password = '';
+$confirm_password = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? ''); // 修改位置
+    $email = trim($_POST['email'] ?? ''); // 修改位置
+    $password = trim($_POST['password'] ?? ''); // 修改位置
+    $confirm_password = trim($_POST['confirm_password'] ?? ''); // 修改位置
+
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        $error = 'All fields are required.';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match.';
+    } else {
+        $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $error = 'Email already registered.';
+        } else {
+            $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE username = ?');
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                $error = 'Username already taken.';
+            } else {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password) VALUES (?, ?, ?)');
+                $stmt->execute([$username, $email, $hashedPassword]);
+                header('Location: index.php');
+                exit();
+            }
+        }
+    }
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $email = trim($_POST['email'] ?? ''); // 修改位置
+  $password = trim($_POST['password'] ?? ''); // 修改位置
+
+  if (empty($email) || empty($password)) {
+      $error = 'Email and Password are required.';
+  } else {
+      $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
+      $stmt->execute([$email]);
+      $user = $stmt->fetch();
+
+      if ($user && password_verify ($password, $user['password'])) {
+          $_SESSION['user'] = $user;
+          $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
+          unset($_SESSION['redirect_to']);
+          header("Location: $redirect");
+          exit();
+      } else {
+          $error = 'Invalid email or password.';
+      }
+  }
+}
+
+
 ?>
 
 <!doctype html>
@@ -57,11 +123,11 @@ if (isset($_GET['logout'])) {
               </button>
             <?php else: ?>
               <div class="dropdown">
-                <a href="./auth.php" class="dropdown-toggle" id="userdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="dropdown-toggle" id="userdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fa fa-user user-icon" style="color: #2dd796;"></i><?php echo htmlspecialchars($_SESSION['user']['username']); ?>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                  <li><a class="dripdown-item" href="?logout=true">Logout</a></li>
+                  <li><a class="dropdown-item" href="?logout=true">Logout</a></li>
                 </ul>
               </div>
             <?php endif; ?> 
@@ -121,15 +187,16 @@ if (isset($_GET['logout'])) {
 
 <!-- Auth Modal -->
 <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-xl"> 
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="authModalLabel">Login / Register</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body d-flex justify-content-between"> 
         <!-- Login Form -->
-        <form id="loginForm" action="login.php" method="post">
+        <form id="loginForm" action="#" method="post" class="flex-grow-1 me-3"> 
+        <p>Login</p>  
           <div class="mb-3">
             <label for="loginEmail" class="form-label">Email address</label>
             <input type="email" class="form-control" id="loginEmail" name="email" required>
@@ -140,23 +207,35 @@ if (isset($_GET['logout'])) {
           </div>
           <button type="submit" class="btn btn-primary">Login</button>
         </form>
-        <hr>
         <!-- Register Form -->
-        <form id="registerForm" action="signup.php" method="post">
-          <div class="mb-3">
-            <label for="registerEmail" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="registerEmail" name="email" required>
+        <form id="registerForm" action="#" method="post" class="flex-grow-1 ms-3"> 
+          <p>Register</p>  
+          <div class="input-group mb-3">
+            <input type="text" name="username" class="form-control form-control-lg bg-light fs-6" placeholder="Username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" required>
           </div>
-          <div class="mb-3">
-            <label for="registerPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="registerPassword" name="password" required>
+          <div class="input-group mb-3">
+              <input type="text" name="email"class="form-control form-control-lg bg-light fs-6" placeholder="Email address" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required>
           </div>
-          <button type="submit" class="btn btn-primary">Register</button>
+          <div class="input-group mb-1">
+              <input type="password" name="password"class="form-control form-control-lg bg-light fs-6" placeholder="Password" required>
+          </div>
+          <div class="input-group mb-1">
+              <input type="password"  name="confirm_password"class="form-control form-control-lg bg-light fs-6" placeholder="Confirm Password" required>
+          </div>
+          <div class="input-group mb-5 d-flex justify-content-between">
+              <div class="forgot">
+                 <small><a href="./forgot_password.php">Forgot Password?</a></small>
+              </div>
+          </div>
+          <div class="input-group mb-3">
+              <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+<!-- End of Auth Modal -->
 
 
 

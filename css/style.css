@@ -148,13 +148,13 @@ body{
 
 /*header*/
 
-/* 移除下拉菜單項目的背景顏色 */
+
 .product-dropdown-menu .dropdown-item {
     background-color: transparent;
     border: none;
 }
 
-/* 移除下拉菜單項目在懸停和聚焦時的背景顏色 */
+
 .product-dropdown-menu .dropdown-item:hover,
 .product-dropdown-menu .dropdown-item:focus {
     background-color: transparent;
@@ -674,6 +674,41 @@ a {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+/*auth*/
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+.auth-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: row; /* Ensure it is set to row */
+    justify-content: space-between; /* Space between the two sections */
+}
+.auth-left,
+.auth-right {
+    flex: 1;
+    padding: 20px;
+    max-width: 50%; /* Ensure the width is not exceeding 50% */
+}
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
 
 
 

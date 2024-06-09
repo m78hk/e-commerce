@@ -2,6 +2,8 @@
 session_start();
 include 'database.php';
 
+
+
 $error = '';
 $username = '';
 $email = '';
