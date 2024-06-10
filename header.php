@@ -30,10 +30,10 @@ $password = '';
 $confirm_password = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? ''); // 修改位置
-    $email = trim($_POST['email'] ?? ''); // 修改位置
-    $password = trim($_POST['password'] ?? ''); // 修改位置
-    $confirm_password = trim($_POST['confirm_password'] ?? ''); // 修改位置
+    $username = trim($_POST['username'] ?? ''); 
+    $email = trim($_POST['email'] ?? ''); 
+    $password = trim($_POST['password'] ?? ''); 
+    $confirm_password = trim($_POST['confirm_password'] ?? ''); 
 
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = 'All fields are required.';
@@ -66,8 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $email = trim($_POST['email'] ?? ''); // 修改位置
-  $password = trim($_POST['password'] ?? ''); // 修改位置
+  $email = trim($_POST['email'] ?? ''); 
+  $password = trim($_POST['password'] ?? ''); 
 
   if (empty($email) || empty($password)) {
       $error = 'Email and Password are required.';
@@ -146,13 +146,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </span>
                   </a>
               </button>
-              <button type = "button" class = "btn position-relative">
-                <a href="#">
-                  <i class = "fa fa-search" style="color: #2dd796;"></i>
-                </a>
-             </button>
+              <button type="button" class="btn position-relative" id="searchButton">
+                    <a href="#">
+                        <i class="fa fa-search" style="color: #2dd796;"></i>
+                    </a>
+                </button>
+                <div class="search-container">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search products">
+                    <div class="dropdown-menu custom-dropdown" id="searchResults" style="display: none;"></div>
+                </div>
           </div>
-          
           <button class = "navbar-toggler border-0" type = "button" data-bs-toggle = "collapse" data-bs-target = "#navMenu">
               <span class = "navbar-toggler-icon"></span>
           </button>
@@ -246,19 +249,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Add Isotope library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
-<!--bootstrap js-->
-
 <!--custom js-->
 <script src="./js/style.js"></script>
 
-<script>
-    function openAuthModal() {
+    <script>
+      function openAuthModal() {
         var authModal = new bootstrap.Modal(document.getElementById('authModal'));
         authModal.show();
-    }
+      }
 
+      $(document).ready(function() {
+            $('#searchButton').on('click', function() {
+                $('.search-container').toggle();
+                $('#searchInput').focus();
+            });
 
+            $('#searchInput').on('input', function() {
+                var query = $(this).val();
+                if (query.length > 2) {
+                    $.ajax({
+                        url: 'search.php',
+                        method: 'GET',
+                        data: { search: query },
+                        success: function(data) {
+                            $('#searchResults').html(data).show();
+                        }
+                    });
+                } else {
+                    $('#searchResults').hide();
+                }
+            });
 
+            $(document).on('click', '.search-result-item', function() {
+                var productId = $(this).data('id');
+                window.location.href = 'product.php?id=' + productId;
+            });
+
+            $(document).click(function(event) {
+                if (!$(event.target).closest('.search-container, #searchButton').length) {
+                    $('#searchResults').hide();
+                    $('.search-container').hide();
+                }
+            });
+        });
     </script>
   </body>
 </html>
