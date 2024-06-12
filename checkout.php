@@ -67,20 +67,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-$address = $_SESSION['address'] ?? '';
-$phone = $_SESSION['phone'] ?? '';
-$payment_info = $_SESSION['payment_info'] ?? '';
+    $address = $_SESSION['address'] ?? '';
+    $phone = $_SESSION['phone'] ?? '';
+    $payment_info = $_SESSION['payment_info'] ?? '';
 
-$subtotal = $_SESSION['subtotal'] ?? 0;
-$tax = $_SESSION['tax'] ?? 0;
-$shipping = $_SESSION['shipping'] ?? 0;
-$total = $_SESSION['total'] ?? 0;
+    $subtotal = $_SESSION['subtotal'] ?? 0;
+    $tax = $_SESSION['tax'] ?? 0;
+    $shipping = $_SESSION['shipping'] ?? 0;
+    $total = $_SESSION['total'] ?? 0;
 
-$products = [];
-$stmt = $pdo->query('SELECT * FROM products');
-while ($row = $stmt->fetch()) {
-    $products[$row['product_id']] = $row;
-}
+    $products = [];
+    $stmt = $pdo->query('SELECT * FROM products');
+    while ($row = $stmt->fetch()) {
+        $products[$row['product_id']] = $row;
+    }
 
 
 
