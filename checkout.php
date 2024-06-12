@@ -3,6 +3,8 @@
 session_start();
 include 'database.php';
 
+
+
 if (!isset($_SESSION['user'])) {
     echo 'User not logged in.';
     exit;
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['total'] = $total;
     }
 } else {
-    // 無論如何從數據庫中獲取最新的用戶信息並更新SESSION
+    
     $stmt = $pdo->prepare('SELECT address, phone, payment_info FROM tb_accounts WHERE uid = ?');
     $stmt->execute([$userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -52,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['phone'] = $user['phone'] ?? '';
         $_SESSION['payment_info'] = $user['payment_info'] ?? '';
     } else {
-        // 如果從數據庫中無法獲取用戶信息，則將SESSION中的對應值設為空
+        
         $_SESSION['address'] = '';
         $_SESSION['phone'] = '';
         $_SESSION['payment_info'] = '';
@@ -64,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['total'] = $_SESSION['total'] ?? 0;
 }
 
-// 從SESSION中獲取數據
+
 $address = $_SESSION['address'] ?? '';
 $phone = $_SESSION['phone'] ?? '';
 $payment_info = $_SESSION['payment_info'] ?? '';
@@ -114,24 +116,24 @@ while ($row = $stmt->fetch()) {
             </div>
             <div class="col-md-6">
                 <h3>Enter Your Information:</h3>
-                <form method="POST" action="checkout.php">
+                <form method="POST" class="right-bar" action="checkout.php">
                     <div class="mb-3">
                         <label for="address" class="form-label">Address:</label>
-                        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($address); ?>" required>
+                        <input type="text" class="form-control" id="address" name="address" value="<?php echo isset($address) ? htmlspecialchars($address) : ''; ?>" required>
                     </div>
                     <div class="mb-3">
                         <label for="Phone" class="form-label">Phone No</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($phone); ?>"required>
+                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo isset($phone) ? htmlspecialchars($phone) : ''; ?>"required>
                     </div>
                     <div class="mb-3">
                         <label for="payment_info" class="form-label">Payment Information</label>
-                        <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo htmlspecialchars($payment_info); ?>"required>
+                        <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo isset($payment_info) ? htmlspecialchars($payment_info) : ''; ?>"required>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Information</button>
                 </form>
-                <form method="POST" action="pay.php">
+                <br>
+                <form method="POST" class="right-bar" action="pay.php">
                     <div class="mb-3">
-                    <br>    
                         <label for="subtotal" class="form-label">Subtotal:</label>
                         <input type="text" class="form-control" id="subtotal" name="subtotal" value="<?php echo htmlspecialchars($subtotal); ?>" readonly>
                     </div>
