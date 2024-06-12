@@ -1,0 +1,24 @@
+Action: remove_from_checklist
+Product removed from checklist: 1
+Action: remove_from_checklist
+Product removed from checklist: 1
+Action: remove_from_checklist
+Product removed from checklist: 2
+Action: remove_from_checklist
+Product removed from checklist: 3
+Action: remove_from_checklist
+Product removed from checklist: 1
+Action: remove_from_checklist
+Product removed from checklist: 2
+Action: remove_from_checklist
+Product removed from checklist: 3
+Action: remove_from_checklist
+Product removed from checklist: 1
+Action: remove_from_checklist
+Product removed from checklist: 2
+Action: remove_from_checklist
+Product removed from checklist: 3
+Action: remove_from_checklist
+Product removed from checklist: 4
+Action: remove_from_checklist
+Product removed from checklist: 5

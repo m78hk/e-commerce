@@ -38,6 +38,8 @@ function removeFromCart($product_id) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
             $_SESSION['cart_quantity'] = getCartQuantity();
+            error_log("Action: remove_from_checklist\n", 3, 'log.txt');
+            error_log("Product removed from checklist: $product_id\n", 3, 'log.txt');
             echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
             exit;
         }
@@ -146,7 +148,14 @@ include 'header.php';
                 <p><span>Shipping</span> <span>$<?php echo number_format($shipping, 2); ?></span></p>
                 <hr>
                 <p><span>Total</span> <span id="cart-total">$<?php echo number_format($total, 2); ?></span></p>
-                <a href="#"><i class="fa fa-shopping-cart"></i>Checkout</a>
+            <form id="checkoutForm" method="POST" action="checkout.php">
+                <input type="hidden" name="subtotal" value="<?php echo number_format($subtotal, 2); ?>">
+                <input type="hidden" name="tax" value="<?php echo number_format($tax, 2); ?>">
+                <input type="hidden" name="shipping" value="<?php echo number_format($shipping, 2); ?>">
+                <input type="hidden" name="total" value="<?php echo number_format($total, 2); ?>">
+                <input type="hidden" name="cart" value="<?php echo htmlspecialchars(json_encode($_SESSION['cart'])); ?>">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-shopping-cart"></i> Checkout</button>
+            </form>    
             </div>
         </div>
     </div>

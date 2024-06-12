@@ -127,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <i class="fa fa-user user-icon" style="color: #2dd796;"></i><?php echo htmlspecialchars($_SESSION['user']['username']); ?>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                  <li><a class="dropdown-item" href="info.php">Info</a></li>
                   <li><a class="dropdown-item" href="?logout=true">Logout</a></li>
                 </ul>
               </div>
@@ -254,7 +255,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
       function openAuthModal() {
-        var authModal = new bootstrap.Modal(document.getElementById('authModal'));
+        var authModal = new bootstrap.Modal(document.getElementById('authModal'), {
+          backdrop: 'static',
+          keyboard: false
+        });
         authModal.show();
       }
 
