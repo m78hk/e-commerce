@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 11, 2024 at 10:00 AM
+-- Generation Time: Jun 17, 2024 at 07:34 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -32,12 +32,15 @@ USE `abcshop_mydb`;
 DROP TABLE IF EXISTS `cart`;
 CREATE TABLE IF NOT EXISTS `cart` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(6) NOT NULL,
-  `item` varchar(255) NOT NULL,
+  `uid` int(6) NOT NULL,
+  `product_id` varchar(255) NOT NULL,
   `quantity` int(11) DEFAULT 1,
+  `product_name` varchar(255) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `image` longblob NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  KEY `user_id` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -48,12 +51,12 @@ CREATE TABLE IF NOT EXISTS `cart` (
 DROP TABLE IF EXISTS `checklist`;
 CREATE TABLE IF NOT EXISTS `checklist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(6) NOT NULL,
+  `uid` int(6) NOT NULL,
   `product_id` varchar(255) NOT NULL,
   `completed` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  KEY `user_id` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -72,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   `best_seller_label` varchar(255) NOT NULL,
   `quantity` int(11) DEFAULT 1,
   PRIMARY KEY (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `products`
@@ -107,14 +110,14 @@ CREATE TABLE IF NOT EXISTS `tb_accounts` (
   `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `payment_info` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`uid`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_accounts`
 --
 
 INSERT INTO `tb_accounts` (`uid`, `username`, `password`, `email`, `phone`, `address`, `payment_info`) VALUES
-(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '', '', '');
+(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '123456789', 'abcd1213', '987654321');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

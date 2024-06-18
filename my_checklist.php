@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    
     } elseif (isset($_POST['product_id']) && $action === 'remove_from_checklist') {
         $product_id = $_POST['product_id'];
-        $stmt = $pdo->prepare('DELETE FROM checklist WHERE product_id = ? AND user_id = ?');
+        $stmt = $pdo->prepare('DELETE FROM checklist WHERE product_id = ? AND uid = ?');
 		if ($stmt->execute([$product_id, $user_id])) {
 			if (isset($_SESSION['checklist'])) {
                 foreach ($_SESSION['checklist'] as $key => $item) {
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 
 $stmt = $pdo->prepare('SELECT checklist.id, checklist.product_id, products.product_name, products.price, 
-	products.image FROM checklist LEFT JOIN products ON checklist.product_id = products.product_id WHERE checklist.user_id = ?');
+	products.image FROM checklist LEFT JOIN products ON checklist.product_id = products.product_id WHERE checklist.uid = ?');
 $stmt->execute([$user_id]);
 $items= $stmt->fetchAll();
 

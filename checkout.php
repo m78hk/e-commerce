@@ -115,22 +115,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endforeach; ?>
             </div>
             <div class="col-md-6">
-                <h3>Enter Your Information:</h3>
-                <form method="POST" class="right-bar" action="checkout.php">
+                <div class="right-bar">
+                    <h3>User Information:</h3>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username:</label>
+                        <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($_SESSION['user']['username']); ?>" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Phone" class="form-label">Phone No:</label>
+                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($_SESSION['user']['phone']); ?>" readonly>
+                    </div>
                     <div class="mb-3">
                         <label for="address" class="form-label">Address:</label>
-                        <input type="text" class="form-control" id="address" name="address" value="<?php echo isset($address) ? htmlspecialchars($address) : ''; ?>" required>
+                        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($_SESSION['user']['address']); ?>" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="Phone" class="form-label">Phone No</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo isset($phone) ? htmlspecialchars($phone) : ''; ?>"required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="payment_info" class="form-label">Payment Information</label>
-                        <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo isset($payment_info) ? htmlspecialchars($payment_info) : ''; ?>"required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Information</button>
-                </form>
+                        <label for="payment_info" class="form-label">Payment Information:</label>
+                        <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo htmlspecialchars($_SESSION['user']['payment_info']); ?>" readonly>
+                    </div> 
+                </div>
+
                 <br>
                 <form method="POST" class="right-bar" action="pay.php">
                     <div class="mb-3">

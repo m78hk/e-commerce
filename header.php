@@ -29,6 +29,8 @@ $email = '';
 $password = '';
 $confirm_password = '';
 
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? ''); 
     $email = trim($_POST['email'] ?? ''); 
@@ -141,7 +143,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </button>
               <button type = "button" class = "btn position-relative">
                   <a href="./my_checklist.php">
+                  <?php if (!$isLoggedIn): ?>
                     <i class = "fa fa-heart" style="color: #2dd796;"></i>
+                  <?php else: ?>
+                    <i class = "fa fa-heart" style="color: #2dd796;"></i>
+                  <?php endif; ?>
                     <span id="checklist-count" class = "position-absolute top-0 start-100 translate-middle badge bg-primary">
                       <?php echo count($_SESSION['checklist']); ?>
                     </span>
@@ -166,14 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./index.php">home</a>
                   </li>
-                  
+                  <!--
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./login.php">login</a>
                   </li>
                   <li class = "nav-item px-2 py-2">
                       <a class = "nav-link text-uppercase text-dark" href = "./signup.php">SignUp</a>
                   </li>
-                  
+                  -->
                   <li class="nav-item dropdown px-2 py-2 border-0">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       PRODUCT
@@ -254,15 +260,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="./js/style.js"></script>
 
     <script>
-      function openAuthModal() {
-        var authModal = new bootstrap.Modal(document.getElementById('authModal'), {
-          backdrop: 'static',
-          keyboard: false
-        });
-        authModal.show();
-      }
+        $(document).ready(function() {
+        function openAuthModal() {
+          var authModal = new bootstrap.Modal(document.getElementById('authModal'), {
+            backdrop: 'static',
+            keyboard: false
+          });
+          authModal.show();
+        }
 
-      $(document).ready(function() {
+        $(document).on('click', '.fa-user', function(event) {
+            event.preventDefault(); 
+
+            
+            if (!<?php echo $isLoggedIn ? 'true' : 'false'; ?>) {
+                
+                openAuthModal();
+            } else {
+                
+                window.location.href = 'index.php';
+            }
+        });
+
+        
+        $(document).on('click', '.fa-heart', function(event) {
+            event.preventDefault(); 
+
+            
+            if (!<?php echo $isLoggedIn ? 'true' : 'false'; ?>) {
+                
+                openAuthModal();
+            } else {
+                
+                window.location.href = 'my_checklist.php';
+            }
+        });
+
             $('#searchButton').on('click', function() {
                 $('.search-container').toggle();
                 $('#searchInput').focus();
