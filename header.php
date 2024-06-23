@@ -11,10 +11,20 @@ if (!isset($_SESSION['checklist'])) {
     $_SESSION['checklist'] = [];
 }
 
-
-
 $cartQuantity = getCartQuantity();
+
 $isLoggedIn = isset($_SESSION['user']);
+$isAdmin = false;
+
+
+
+if ($isLoggedIn) {
+  echo "User is logged in, UID: " . $_SESSION['user']['uid'];
+  $isAdmin = isAdmin($pdo, $_SESSION['user']['uid']); // Update isAdmin variable
+  echo "User Id" . $_SESSION['user']['uid'] . "is admin: " . $isAdmin;
+} else {
+  echo "User is not logged in";
+}
 
 if (isset($_GET['logout'])) {
   session_unset();

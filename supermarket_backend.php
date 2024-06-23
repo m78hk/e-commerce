@@ -6,10 +6,17 @@ error_reporting(E_ALL);
 session_start();
 include 'database.php';
 
+
+
 // 確保用戶已登入
 if (!isset($_SESSION['user']['uid'])) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit();
+}
+
+if (!isset($_SESSION['user']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
+    header('Location: index.php');
+    exit;
 }
 
 // 處理 POST 請求

@@ -23,4 +23,18 @@ try {
 } catch (\PDOException $e) {
     echo 'Connection failed: ' . $e->getMessage();
 }
+
+if (!function_exists('isAdmin')) {
+    function isAdmin($pdo, $userId) {
+        $stmt = $pdo->prepare('SELECT is_admin FROM tb_accounts WHERE uid = ?');
+        $stmt->execute([$userId]);
+        $isAdmin = $stmt->fetchColumn();
+        if ($isAdmin === false) {
+            echo "Failed to fetch is_admin status for user $userId";
+        } else {
+            echo "User ID $userId is_admin status is $isAdmin";
+        }
+        return $isAdmin == 1;
+    }
+}
 ?>
