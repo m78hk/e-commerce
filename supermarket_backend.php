@@ -7,16 +7,16 @@ session_start();
 include 'database.php';
 
 
-
+ 
 // 確保用戶已登入
 if (!isset($_SESSION['user']['uid'])) {
-    header('Location: index.php');
+    header('Location: login_sk_tb.php');
     exit();
 }
 
-if (!isset($_SESSION['user']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
-    header('Location: index.php');
-    exit;
+if (!isset($_SESSION['user']['uid']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
+    header('Location: login_sk_tb.php');
+    exit();
 }
 
 // 處理 POST 請求
@@ -99,7 +99,15 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supermarket Backend</title>
     <body>
-        <h1>Product Mangement</h1>
+    <h1>Product Mangement</h1>
+    <a href="tb_accounts_backend.php">Manage User Accounts</a>
+    <br>
+    <br>
+    <div id="logout-container">
+        <a href="login_sk_tb.php" class="logout-button">Logout</a>
+    </div>
+    <br>
+    <br>
         <form id="add-product-form" enctype="multipart/form-data">
             <input type="hidden" name="action" value="add_product">
             <label>Product Name:</label>
@@ -207,7 +215,22 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
+        .logout-button {
+    color: #ffffff;
+    background-color: #dc3545;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    }
 
+    .logout-button:hover {
+    background-color: #c82333;
+    }
+
+    #logout-container {
+    text-align: left; 
+    margin-top: 10px; 
+    }
     </style>
     <script>
         document.getElementById('add-product-form').addEventListener('submit', function(event) {

@@ -8,12 +8,12 @@ include 'database.php';
 
 // 確保用戶已登入
 if (!isset($_SESSION['user']['uid'])) {
-    header('Location: index.php');
+    header('Location: login_sk_tb.php');
     exit();
 }
 
-if (!isset($_SESSION['user']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
-    header('Location: index.php');
+if ($_SESSION['user']['is_admin'] != 1) {
+    header('Location: login_sk_tb.php');
     exit();
 }
 
@@ -102,6 +102,14 @@ try {
 </head>
 <body>
     <h1>Account Management</h1>
+    <a href="supermarket_backend.php">supermarket_backend</a>
+    <br>
+    <br>
+    <div id="logout-container">
+        <a href="login_sk_tb.php" class="logout-button">Logout</a>
+    </div>
+    <br>
+    <br>
     <form id="add-account-form">
         <input type="hidden" name="action" value="add_account">
         <label>Username:</label>
@@ -216,6 +224,23 @@ try {
         padding: 20px;
         border: 1px solid #ccc;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-button {
+    color: #ffffff;
+    background-color: #dc3545;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    }
+
+    .logout-button:hover {
+    background-color: #c82333;
+    }
+
+    #logout-container {
+    text-align: left; 
+    margin-top: 10px; 
     }
 </style>
 <script>

@@ -30,9 +30,9 @@ if (!function_exists('isAdmin')) {
         $stmt->execute([$userId]);
         $isAdmin = $stmt->fetchColumn();
         if ($isAdmin === false) {
-            echo "Failed to fetch is_admin status for user $userId";
+            // echo "Failed to fetch is_admin status for user $userId";
         } else {
-            echo "User ID $userId is_admin status is $isAdmin";
+            // echo "User ID $userId is_admin status is $isAdmin";
         }
         return $isAdmin == 1;
     }
