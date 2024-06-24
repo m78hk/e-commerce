@@ -1,95 +1,16 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 include 'database.php';
 
-
- 
-// 確保用戶已登入
-if (!isset($_SESSION['user']['uid'])) {
-    header('Location: login_sk_tb.php');
-    exit();
-}
 
 if (!isset($_SESSION['user']['uid']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
     header('Location: login_sk_tb.php');
     exit();
 }
 
-// 處理 POST 請求
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
-
-    // add new product
-    if (isset($_POST['action']) && $_POST['action'] === 'add_product') {
-        $product_name = $_POST['product_name'];
-        $price = $_POST['price'];
-        $image = file_get_contents($_FILES['image']['tmp_name']); 
-        $label = $_POST['label'];
-        $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'];
-        $quantity = $_POST['quantity'];
-
-        $stmt = $pdo->prepare('INSERT INTO products (product_name, price, image, label, rating, best_seller_label, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        if ($stmt->execute([$product_name, $price, $image, $label, $rating, $best_seller_label, $quantity])) {
-            echo json_encode(['status' => 'success', 'message' => 'Product added successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to add product']);
-        }
-        exit;
-    }
-
-    // delete product
-    if (isset($_POST['action']) && $_POST['action'] === 'delete_product') {
-        $product_id = $_POST['product_id'];
-
-        $stmt = $pdo->prepare('DELETE FROM products WHERE product_id = ?');
-        if ($stmt->execute([$product_id])) {
-            echo json_encode(['status' => 'success', 'message' => 'Product deleted successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to delete product']);
-        }
-        exit;
-    }
-
-    // edit product
-    if (isset($_POST['action']) && $_POST['action'] === 'edit_product') {
-        $product_id = $_POST['product_id'];
-        $product_name = $_POST['product_name'];
-        $price = $_POST['price'];
-        $label = $_POST['label'];
-        $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'];
-        $quantity = $_POST['quantity'];
-
-        if (!empty($_FILES['image']['tmp_name'])) {
-            $image = file_get_contents($_FILES['image']['tmp_name']);
-            $stmt = $pdo->prepare('UPDATE products SET product_name = ?, price = ?, 
-            image = ?, label = ?, rating = ?, best_seller_label = ?, quantity = ? WHERE product_id = ?');
-            $params = [$product_name, $price, $image, $label, $rating, $best_seller_label, $quantity, $product_id];
-        } else {
-            $stmt = $pdo->prepare('UPDATE products SET product_name = ?, price = ?, label = ?, 
-            rating = ?, best_seller_label = ?, quantity = ? WHERE product_id = ?');
-            $params = [$product_name, $price, $label, $rating, $best_seller_label, $quantity, $product_id];
-        }
-
-        if ($stmt->execute($params)) {
-            echo json_encode(['status' => 'success', 'message' => 'Product updated successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to update product']);
-        }
-        exit;
-    }
-}
-
-// get all products
-$stmt = $pdo->query('SELECT * FROM products');
+$stmt = $pdo->prepare('SELECT * FROM products');
+$stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -120,13 +41,32 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <input type="file" name="image" accept="image/*" required><br>
             <br>
             <label>Label:</label>
-            <input type="text" name="label"><br>
+            <select name="label">
+                <option value="new">New</option>
+                <option value="sale">Sale</option>
+                <option value="hot">Hot</option>
+            </select><br>
             <br>
             <label>Rating:</label>
-            <input type="number" name="rating" step="0.1" min="0" max="5"><br>
+            <select name="rating">
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+                <option value="2.5">2.5</option>
+                <option value="3">3</option>
+                <option value="3.5">3.5</option>
+                <option value="4">4</option>
+                <option value="4.5">4.5</option>
+                <option value="5">5</option>
+            </select><br>
             <br>
             <label> Best Seller Label:</label>
-            <input type="text" name="best_seller_label"><br>
+            <select name="Best Seller label">
+                <option value="all">All</option>
+                <option value="best sellers">Best Sellers</option>
+                <option value="featured">Featrued</option>
+                <option value="new arrival">New Arrival</option>
+            </select><br>
             <br>
             <label>Quantity:</label>
             <input type="number" name="quantity" required><br>
@@ -148,7 +88,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody  id="'products-tbody">
                 <?php foreach ($products as $product): ?>
                     <tr>
                         <td><?= htmlspecialchars($product['product_id']) ?></td>
@@ -216,38 +156,67 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .logout-button {
-    color: #ffffff;
-    background-color: #dc3545;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    }
+        color: #ffffff;
+        background-color: #dc3545;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        }
 
-    .logout-button:hover {
-    background-color: #c82333;
-    }
+        .logout-button:hover {
+        background-color: #c82333;
+        }
 
-    #logout-container {
-    text-align: left; 
-    margin-top: 10px; 
-    }
+        #logout-container {
+        text-align: left; 
+        margin-top: 10px; 
+        }
     </style>
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('api/products.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const tbody = document.getElementById('products-tbody');
+                    tbody.innerHTML = '';
+                    data.products.forEach(product => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${product.product_id}</td>
+                            <td>${product.product_name}</td>
+                            <td>${product.price}</td>
+                            <td>${product.label}</td>
+                            <td>${product.rating}</td>
+                            <td>${product.best_seller_label}</td>
+                            <td>${product.quantity}</td>
+                            <td>
+                                <button onclick="editProduct(${product.product_id})">Edit</button>
+                                <form class="delete-product-form" data-id="${product.product_id}" style="display:inline;">
+                                    <input type="hidden" name="action" value="delete_product">
+                                    <input type="hidden" name="product_id" value="${product.product_id}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+
         document.getElementById('add-product-form').addEventListener('submit', function(event) {
             event.preventDefault();
             var formData = new FormData(this);
 
-            fetch('supermarket_backend.php', {
+            fetch('api/products.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
+                alert(data.message);
                 if (data.status === 'success') {
-                    alert(data.message);
                     location.reload();
-                } else {
-                    alert(data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -258,39 +227,26 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 event.preventDefault();
                 var formData = new FormData(this);
 
-                fetch('supermarket_backend.php', {
+                fetch('api/products.php', {
                     method: 'POST',
                     body: formData
                 })
                 .then(response => response.json())
-                ithen(data => {
+                .then(data => {
+                    alert(data.message);
                     if (data.status === 'success') {
-                        alert(data.message);
                         location.reload();
-                    } else {
-                        alert(data.message);
                     }
-                }).catch(error => console.error('Error:', error));
+                })
+                .catch(error => console.error('Error:', error));
             });
         });
-
-        function editProduct(productId) {
-            var row = document.querySelector(`form[data-id='${productId}']`).closest('tr');
-            document.getElementById('edit-product-id').value = productId;
-            document.getElementById('edit-product-name').value = row.cells[1].textContent;
-            document.getElementById('edit-product-price').value = row.cells[2].textContent;
-            document.getElementById('edit-product-label').value = row.cells[3].textContent;
-            document.getElementById('edit-product-rating').value = row.cells[4].textContent;
-            document.getElementById('edit-product-best-seller-label').value = row.cells[5].textContent;
-            document.getElementById('edit-product-quantity').value = row.cells[6].textContent;
-            document.getElementById('edit-product-modal').style.display = 'block';
-        }
 
         document.getElementById('edit-product-form').addEventListener('submit', function(event) {
             event.preventDefault();
             var formData = new FormData(this);
 
-            fetch('supermarket_backend.php', {
+            fetch('api/products.php', {
                 method: 'POST',
                 body: formData
             })
@@ -299,14 +255,27 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 alert(data.message);
                 if (data.status === 'success') {
                     location.reload();
-                } 
+                }
             })
             .catch(error => console.error('Error:', error));
         });
+    });
 
-        function closeEditModal() {
-            document.getElementById('edit-product-modal').style.display = 'none';
-        }
-    </script>
+    function editProduct(productId) {
+        var row = document.querySelector(`form[data-id='${productId}']`).closest('tr');
+        document.getElementById('edit-product-id').value = productId;
+        document.getElementById('edit-product-name').value = row.cells[1].textContent;
+        document.getElementById('edit-product-price').value = row.cells[2].textContent;
+        document.getElementById('edit-product-label').value = row.cells[3].textContent;
+        document.getElementById('edit-product-rating').value = row.cells[4].textContent;
+        document.getElementById('edit-product-best-seller-label').value = row.cells[5].textContent;
+        document.getElementById('edit-product-quantity').value = row.cells[6].textContent;
+        document.getElementById('edit-product-modal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-product-modal').style.display = 'none';
+    }
+</script>
 </head>
 </html>

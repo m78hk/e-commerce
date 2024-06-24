@@ -1,12 +1,8 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 include 'database.php';
 
-// 確保用戶已登入
+
 if (!isset($_SESSION['user']['uid'])) {
     header('Location: login_sk_tb.php');
     exit();
@@ -17,72 +13,11 @@ if ($_SESSION['user']['is_admin'] != 1) {
     exit();
 }
 
-// 處理 POST 請求
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
 
-    // add new account
-    if (isset($_POST['action']) && $_POST['action'] === 'add_account') {
-        $username = $_POST['username'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $email = $_POST['email'];
-        $role = $_POST['role'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
-        $payment_info = $_POST['payment_info'];
-        $is_admin = isset($_POST['is_admin']) ? 1 : 0;
-
-        $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, password, email, phone, address, payment_info, role, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        if ($stmt->execute([$username, $password, $email, $phone, $address, $payment_info, $role, $is_admin])) {
-            echo json_encode(['status' => 'success', 'message' => 'Account added successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to add account']);
-        }
-        exit();
-    }
-
-    // delete account
-    if (isset($_POST['action']) && $_POST['action'] === 'delete_account') {
-        $uid = $_POST['uid'];
-
-        $stmt = $pdo->prepare('DELETE FROM tb_accounts WHERE uid = ?');
-        if ($stmt->execute([$uid])) {
-            echo json_encode(['status' => 'success', 'message' => 'Account deleted successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to delete account']);
-        }
-        exit();
-    }
-
-    // edit account
-    if (isset($_POST['action']) && $_POST['action'] === 'edit_account') {
-        $uid = $_POST['uid'];
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-        $role = $_POST['role'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
-        $payment_info = $_POST['payment_info'];
-        $is_admin = isset($_POST['is_admin']) ? 1 : 0;
-
-        $stmt = $pdo->prepare('UPDATE tb_accounts SET username = ?, email = ?, role = ?, phone = ?, address = ?, payment_info = ?, is_admin = ? WHERE uid = ?');
-        $params = [$username, $email, $role, $phone, $address, $payment_info, $is_admin, $uid];
-
-        if (!empty($_POST['password'])) {
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('UPDATE tb_accounts SET username = ?, password = ?, email = ?, role = ?, phone = ?, address = ?, payment_info = ?, is_admin = ? WHERE uid = ?');
-            $params = [$username, $password, $email, $role, $phone, $address, $payment_info, $is_admin, $uid];
-        }
-
-        if ($stmt->execute($params)) {
-            echo json_encode(['status' => 'success', 'message' => 'Account updated successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to update account']);
-        }
-        exit();
-    }
 }
-
 // get all accounts
 try {
     $stmt = $pdo->query('SELECT * FROM tb_accounts');
@@ -154,7 +89,7 @@ try {
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="account-list">
             <?php if (isset($accounts)) : ?>
                 <?php foreach ($accounts as $account): ?>
                     <tr>
@@ -226,6 +161,15 @@ try {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
+    #edit-account-form label {
+        display: inline-block;
+        width: 100px;
+    }
+
+    #edit-account-form input {
+        margin-bottom: 10px;
+    }
+
     .logout-button {
     color: #ffffff;
     background-color: #dc3545;
@@ -244,84 +188,103 @@ try {
     }
 </style>
 <script>
-    document.getElementById('add-account-form').addEventListener('submit', function(event) {
+        document.getElementById('add-account-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        var formData = new FormData(this);
-
-        fetch('tb_accounts_backend.php', {
+        var formData = new FormData(event.target);
+        fetch('api/accounts.php', {
             method: 'POST',
             body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
+        }).then(response => response.json()).then(data => {
             if (data.status === 'success') {
-                alert(data.message);
-                location.reload();
+                loadAccounts();
+                event.target.reset();
             } else {
                 alert(data.message);
             }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
-    document.querySelectorAll('.delete-account-form').forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            var formData = new FormData(this);
-
-            fetch('tb_accounts_backend.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
         });
     });
-
-    function editAccount(uid) {
-        var row = document.querySelector(`form[data-id='${uid}']`).closest('tr');
-        document.getElementById('edit-account-uid').value = uid;
-        document.getElementById('edit-account-username').value = row.children[1].innerText;
-        document.getElementById('edit-account-email').value = row.children[2].innerText;
-        document.getElementById('edit-account-phone').value = row.children[3].innerText;
-        document.getElementById('edit-account-address').value = row.children[4].innerText;
-        document.getElementById('edit-account-payment-info').value = row.children[5].innerText;
-        document.getElementById('edit-account-role').value = row.children[6].innerText;
-        document.getElementById('edit-account-is-admin').checked = row.children[7].innerText === 'Yes';
-
-        document.getElementById('edit-account-modal').style.display = 'block';
-    }
-
-    function closeEditModal() {
-        document.getElementById('edit-account-modal').style.display = 'none';
-    }
-
-    document.getElementById('edit-account-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-
-        fetch('tb_accounts_backend.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+    function loadAccounts() {
+    fetch('api/accounts.php').then(response => response.json()).then(accounts => {
+        const accountList = document.getElementById('account-list');
+        accountList.innerHTML = '';
+        accounts.forEach(account => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${account.uid}</td>
+                <td>${account.username}</td>
+                <td>${account.email}</td>
+                <td>${account.phone}</td>
+                <td>${account.address}</td>
+                <td>${account.payment_info}</td>
+                <td>${account.role}</td>
+                <td>${account.is_admin ? 'Yes' : 'No'}</td>
+                <td>
+                    <button onclick="editAccount(${account.uid})">Eidt</button>
+                    <form class="delete-account-form" style="display:inline;">
+                        <input type="hidden" name="action" value="delete_account">
+                        <input type="hidden" name="uid" value="${account.uid}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            `;
+            accountList.appendChild(row);
+        });
+        document.querySelectorAll('.delete-account-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (confirm('Are you sure you want to delete this account?')) {
+                    var formData = new FormData(event.target);
+                    fetch('api/accounts.php', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.json()).then(data => {
+                        if (data.status === 'success') {
+                            loadAccounts();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                }
+            });
+        });
     });
+}
+
+function editAccount(uid) {
+    fetch(`api/get_account.php?uid=${uid}`).then(response => response.json()).then(account => {
+        document.getElementById('edit-account-uid').value = account.uid;
+        document.getElementById('edit-account-username').value = account.username;
+        document.getElementById('edit-account-email').value = account.email;
+        document.getElementById('edit-account-phone').value = account.phone;
+        document.getElementById('edit-account-address').value = account.address;
+        document.getElementById('edit-account-payment-info').value = account.payment_info;
+        document.getElementById('edit-account-role').value = account.role;
+        document.getElementById('edit-account-is-admin').checked = account.is_admin;
+        document.getElementById('edit-account-modal').style.display = 'block';
+    });
+}
+
+document.getElementById('edit-account-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var formData = new FormData(event.target);
+    fetch('api/accounts.php', {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json()).then(data => {
+        if (data.status === 'success') {
+            closeEditModal();
+            loadAccounts();
+        } else {
+            alert(data.message);
+        }
+    });
+});
+
+function closeEditModal() {
+    document.getElementById('edit-account-modal').style.display = 'none';
+}
+
+// load accounts when the page is loaded
+loadAccounts();
 </script>
 </html>
