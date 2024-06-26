@@ -118,6 +118,7 @@ function addToCart(productId) {
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'update_cart.php', true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
@@ -129,7 +130,7 @@ function addToCart(productId) {
         }
       }
     };
-  xhr.send(formData);
+  xhr.send('product_id=' + productId + '&action=add_to_cart');
 }
 
 function updateCartCount(totalQuantity) {

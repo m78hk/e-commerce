@@ -40,3 +40,5 @@ Action: remove_from_checklist
 Product removed from checklist: 8
 Action: remove_from_checklist
 Product removed from checklist: 8
+Action: remove_from_checklist
+Product removed from checklist: 1

@@ -115,6 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/bootstrap-5.3.0-dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-firestore.js"></script>
     <!--custom css-->
     <link rel="stylesheet" href="./css/style.css">
     <title>ABC SHOPPING MALL</title>
@@ -339,6 +343,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         });
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
+          authDomain: "abcshop-web.firebaseapp.com",
+          projectId: "abcshop-web",
+          storageBucket: "abcshop-web.appspot.com",
+          messagingSenderId: "293629346772",
+          appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
+          measurementId: "G-RNF3QDCT8F"
+        };
+
+        firebase.initializeApp(firebaseConfig);
     </script>
   </body>
 </html>

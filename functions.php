@@ -14,14 +14,4 @@ if (!function_exists('saveCartToDatabase')) {
         }
     }
 }
-
-if (!function_exists('loadCartFromDatabase')) {
-    function loadCartFromDatabase($userId) {
-        global $pdo;
-        $stmt = $pdo->prepare('SELECT * FROM cart WHERE user_id = ?');
-        $stmt->execute([$userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-}
 ?>
-

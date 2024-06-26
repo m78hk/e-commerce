@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'database.php';
+include '../database.php';
 
 
 if (!isset($_SESSION['user']['uid']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image = file_get_contents($_FILES['image']['tmp_name']); 
         $label = $_POST['label'];
         $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'];
+        $best_seller_label = $_POST['best_seller_label'] ?? '';
         $quantity = $_POST['quantity'];
 
         $stmt = $pdo->prepare('INSERT INTO products (product_name, price, image, label, rating, best_seller_label, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -52,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $price = $_POST['price'];
         $label = $_POST['label'];
         $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'];
+        $best_seller_label = $_POST['best_seller_label'] ?? '';
         $quantity = $_POST['quantity'];
-
+ 
         if (!empty($_FILES['image']['tmp_name'])) {
             $image = file_get_contents($_FILES['image']['tmp_name']);
             $stmt = $pdo->prepare('UPDATE products SET product_name = ?, price = ?, 

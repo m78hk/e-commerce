@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-include 'database.php';
+include '../database.php';
 
 if (!isset($_SESSION['user']['uid']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
     http_response_code(403);
