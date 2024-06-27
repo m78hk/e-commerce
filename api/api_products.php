@@ -4,13 +4,13 @@ include '../database.php';
 
 header('Content-Type: application/json');
 
-// 確保用戶已登入
+
 if (!isset($_SESSION['user']['uid'])) {
     echo json_encode(['status' => 'error', 'message' => 'User not authenticated']);
     exit();
 }
 
-// 處理 POST 請求
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // add new product
     if (isset($_POST['action']) && $_POST['action'] === 'add_product') {
@@ -73,11 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 如果有其他類型的請求，可以根據需要進行擴展
+    
     echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
     exit;
 }
 
-// 如果是 GET 請求，通常用於取得資源列表，這裡可以根據需要進行擴展
+
 echo json_encode(['status' => 'error', 'message' => 'Only POST requests are allowed']);
+
 ?>

@@ -63,7 +63,24 @@
         </thead>
         <tbody>
             <?php if (isset($accounts)) : ?>
-                <?php foreach ($accounts as $account): ?>
+                <?php            
+                include 'database.php';
+                    
+                $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $items_per_page = 10;
+                $offset = ($current_page - 1) * $items_per_page;
+                    
+                $stmt = $pdo->query('SELECT COUNT(*) FROM tb_accounts');
+                $total_products = $stmt->fetchColumn();
+                $total_pages = ceil($total_products / $items_per_page);
+                    
+                $stmt = $pdo->prepare('SELECT * FROM products LIMIT :offset, :items_per_page');
+                $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+                $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
+                $stmt->execute();
+                $products = $stmt->fetchAll();
+                foreach ($accounts as $account): 
+                ?>
                     <tr>
                         <td><?= htmlspecialchars($account['uid']) ?></td>
                         <td><?= htmlspecialchars($account['username']) ?></td>
@@ -87,6 +104,13 @@
             <?php endif; ?>
         </tbody>
     </table>
+
+    <br>
+    <div id="pagination"> 
+        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <a href="?page=<?= $i ?>" class="pagination-link"><?= $i ?></a>
+        <?php endfor; ?>
+    </div>
     
     <div id="edit-account-modal">
         <form id="edit-account-form">
@@ -134,41 +158,41 @@
     }
 
     .logout-button {
-    color: #ffffff;
-    background-color: #dc3545;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
+        color: #ffffff;
+        background-color: #dc3545;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
     }
 
     .logout-button:hover {
-    background-color: #c82333;
+        background-color: #c82333;
     }
 
     #logout-container {
-    text-align: left; 
-    margin-top: 10px; 
+        text-align: left; 
+        margin-top: 10px; 
     }
 
     .supermarket-button {
-    color: #ffffff;
-    background-color: #dc3545;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
+        color: #ffffff;
+        background-color: #dc3545;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
     }
 
     .supermarket-button:hover {
-    background-color: #c82333;
+        background-color: #c82333;
     }
 
     #supermarket-container {
-    text-align: left; 
+        text-align: left; 
         margin-top: 10px;
     }
 </style>
 <script>
-    // 獲取帳戶數據並更新表格
+
     function loadAccounts() {
         fetch('api/get_account.php', {
             method: 'GET',
@@ -208,10 +232,10 @@
         .catch(error => console.error('Error:', error));
     }
 
-    // 載入帳戶數據
+    
     window.onload = loadAccounts;
 
-    // 添加帳戶
+    
     document.getElementById('add-account-form').addEventListener('submit', function(event) {
         event.preventDefault();
         var formData = new FormData(this);
@@ -232,7 +256,7 @@
         .catch(error => console.error('Error:', error));
     });
 
-    // 刪除帳戶
+    
     document.querySelectorAll('.delete-account-form').forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();

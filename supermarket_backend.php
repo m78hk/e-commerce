@@ -80,8 +80,21 @@
         <tbody>
             <?php
             include 'database.php';
-            $stmt = $pdo->query('SELECT * FROM products');
+
+            $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $items_per_page = 10;
+            $offset = ($current_page - 1) * $items_per_page;
+
+            $stmt = $pdo->query('SELECT COUNT(*) FROM products');
+            $total_products = $stmt->fetchColumn();
+            $total_pages = ceil($total_products / $items_per_page);
+
+            $stmt = $pdo->prepare('SELECT * FROM products LIMIT :offset, :items_per_page');
+            $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+            $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
+            $stmt->execute();
             $products = $stmt->fetchAll();
+
             foreach ($products as $product):
             ?>
                 <tr>
@@ -104,6 +117,12 @@
             <?php endforeach; ?>
         </tbody>
     </table>
+    <br>
+    <div id="pagination"> 
+        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <a href="?page=<?= $i ?>" class="pagination-link"><?= $i ?></a>
+        <?php endfor; ?>
+    </div>
     
     <div id="edit-product-modal">
         <form id="edit-product-form" enctype="multipart/form-data">
@@ -168,37 +187,44 @@
         }
 
         .logout-button {
-        color: #ffffff;
-        background-color: #dc3545;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
+            color: #ffffff;
+            background-color: #dc3545;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
         }
 
         .logout-button:hover {
-        background-color: #c82333;
+            background-color: #c82333;
         }
 
         #logout-container {
-        text-align: left; 
-        margin-top: 10px; 
+            text-align: left; 
+            margin-top: 10px; 
         }
 
         .acc-button {
-        color: #ffffff;
-        background-color: #dc3545;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
+            color: #ffffff;
+            background-color: #dc3545;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
         }
 
         .acc-button:hover {
-        background-color: #c82333;
+            background-color: #c82333;
         }
 
         #acc-management-container {
-        text-align: left; 
-        margin-top: 10px;
+            text-align: left; 
+            margin-top: 10px;
+        }
+
+        .pagination-link {
+            margin: 0 5px;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
         }
     </style>
     <script>
