@@ -2,25 +2,24 @@
 session_start();
 include '../database.php';
 
+header('Content-Type: application/json');
 
-if (!isset($_SESSION['user']['uid']) || !isAdmin($pdo, $_SESSION['user']['uid'])) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Forbidden']);
+// 確保用戶已登入
+if (!isset($_SESSION['user']['uid'])) {
+    echo json_encode(['status' => 'error', 'message' => 'User not authenticated']);
     exit();
 }
 
-header('Content-Type: application/json');
-
-
+// 處理 POST 請求
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+    // add new product
     if (isset($_POST['action']) && $_POST['action'] === 'add_product') {
         $product_name = $_POST['product_name'];
         $price = $_POST['price'];
         $image = file_get_contents($_FILES['image']['tmp_name']); 
         $label = $_POST['label'];
         $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'] ?? '';
+        $best_seller_label = $_POST['best_seller_label'];
         $quantity = $_POST['quantity'];
 
         $stmt = $pdo->prepare('INSERT INTO products (product_name, price, image, label, rating, best_seller_label, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -32,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    
+    // delete product
     if (isset($_POST['action']) && $_POST['action'] === 'delete_product') {
         $product_id = $_POST['product_id'];
 
@@ -45,16 +44,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    
+    // edit product
     if (isset($_POST['action']) && $_POST['action'] === 'edit_product') {
         $product_id = $_POST['product_id'];
         $product_name = $_POST['product_name'];
         $price = $_POST['price'];
         $label = $_POST['label'];
         $rating = $_POST['rating'];
-        $best_seller_label = $_POST['best_seller_label'] ?? '';
+        $best_seller_label = $_POST['best_seller_label'];
         $quantity = $_POST['quantity'];
- 
+
         if (!empty($_FILES['image']['tmp_name'])) {
             $image = file_get_contents($_FILES['image']['tmp_name']);
             $stmt = $pdo->prepare('UPDATE products SET product_name = ?, price = ?, 
@@ -73,10 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit;
     }
+
+    // 如果有其他類型的請求，可以根據需要進行擴展
+    echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
+    exit;
 }
 
-
-$stmt = $pdo->query('SELECT * FROM products');
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-echo json_encode(['status' => 'success', 'products' => $products]);
+// 如果是 GET 請求，通常用於取得資源列表，這裡可以根據需要進行擴展
+echo json_encode(['status' => 'error', 'message' => 'Only POST requests are allowed']);
 ?>

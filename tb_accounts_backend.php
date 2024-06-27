@@ -1,94 +1,3 @@
-<?php
-session_start();
-include 'database.php';
-
-
-if (!isset($_SESSION['user']['uid'])) {
-    header('Location: login_sk_tb.php');
-    exit();
-}
-
-if ($_SESSION['user']['is_admin'] != 1) {
-    header('Location: login_sk_tb.php');
-    exit();
-}
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
-
-    // add new account
-    if (isset($_POST['action']) && $_POST['action'] === 'add_account') {
-        $username = $_POST['username'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $email = $_POST['email'];
-        $role = $_POST['role'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
-        $payment_info = $_POST['payment_info'];
-        $is_admin = isset($_POST['is_admin']) ? 1 : 0;
-
-        $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, password, email, phone, address, payment_info, role, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        if ($stmt->execute([$username, $password, $email, $phone, $address, $payment_info, $role, $is_admin])) {
-            echo json_encode(['status' => 'success', 'message' => 'Account added successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to add account']);
-        }
-        exit();
-    }
-
-    // delete account
-    if (isset($_POST['action']) && $_POST['action'] === 'delete_account') {
-        $uid = $_POST['uid'];
-
-        $stmt = $pdo->prepare('DELETE FROM tb_accounts WHERE uid = ?');
-        if ($stmt->execute([$uid])) {
-            echo json_encode(['status' => 'success', 'message' => 'Account deleted successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to delete account']);
-        }
-        exit();
-    }
-
-    // edit account
-    if (isset($_POST['action']) && $_POST['action'] === 'edit_account') {
-        $uid = $_POST['uid'];
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-        $role = $_POST['role'];
-        $phone = $_POST['phone'];
-        $address = $_POST['address'];
-        $payment_info = $_POST['payment_info'];
-        $is_admin = isset($_POST['is_admin']) ? 1 : 0;
-
-        $stmt = $pdo->prepare('UPDATE tb_accounts SET username = ?, email = ?, role = ?, phone = ?, address = ?, payment_info = ?, is_admin = ? WHERE uid = ?');
-        $params = [$username, $email, $role, $phone, $address, $payment_info, $is_admin, $uid];
-
-        if (!empty($_POST['password'])) {
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('UPDATE tb_accounts SET username = ?, password = ?, email = ?, role = ?, phone = ?, address = ?, payment_info = ?, is_admin = ? WHERE uid = ?');
-            $params = [$username, $password, $email, $role, $phone, $address, $payment_info, $is_admin, $uid];
-        }
-
-        if ($stmt->execute($params)) {
-            echo json_encode(['status' => 'success', 'message' => 'Account updated successfully']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to update account']);
-        }
-        exit();
-    }
-}
-
-// get all accounts
-try {
-    $stmt = $pdo->query('SELECT * FROM tb_accounts');
-    $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +7,9 @@ try {
 </head>
 <body>
     <h1>Account Management</h1>
-    <a href="supermarket_backend.php">supermarket_backend</a>
+    <div id="supermarket-container">
+        <a href="supermarket_backend.php" class="supermarket-button">Products Management</a>
+    </div>
     <br>
     <br>
     <div id="logout-container">
@@ -238,8 +149,69 @@ try {
     text-align: left; 
     margin-top: 10px; 
     }
+
+    .supermarket-button {
+    color: #ffffff;
+    background-color: #dc3545;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    }
+
+    .supermarket-button:hover {
+    background-color: #c82333;
+    }
+
+    #supermarket-container {
+    text-align: left; 
+        margin-top: 10px;
+    }
 </style>
 <script>
+    // 獲取帳戶數據並更新表格
+    function loadAccounts() {
+        fetch('api/get_account.php', {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const accounts = data.accounts;
+                const tbody = document.querySelector('#accounts-table tbody');
+                tbody.innerHTML = '';
+                accounts.forEach(account => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${account.uid}</td>
+                        <td>${account.username}</td>
+                        <td>${account.email}</td>
+                        <td>${account.phone}</td>
+                        <td>${account.address}</td>
+                        <td>${account.payment_info}</td>
+                        <td>${account.role}</td>
+                        <td>${account.is_admin ? 'Yes' : 'No'}</td>
+                        <td>
+                            <button onclick="editAccount(${account.uid})">Edit</button>
+                            <form class="delete-account-form" data-id="${account.uid}" style="display:inline;">
+                                <input type="hidden" name="action" value="delete_account">
+                                <input type="hidden" name="uid" value="${account.uid}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                alert('Failed to load accounts: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // 載入帳戶數據
+    window.onload = loadAccounts;
+
+    // 添加帳戶
     document.getElementById('add-account-form').addEventListener('submit', function(event) {
         event.preventDefault();
         var formData = new FormData(this);
@@ -252,7 +224,7 @@ try {
         .then(data => {
             if (data.status === 'success') {
                 alert(data.message);
-                location.reload();
+                loadAccounts();
             } else {
                 alert(data.message);
             }
@@ -260,6 +232,7 @@ try {
         .catch(error => console.error('Error:', error));
     });
 
+    // 刪除帳戶
     document.querySelectorAll('.delete-account-form').forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -273,7 +246,7 @@ try {
             .then(data => {
                 if (data.status === 'success') {
                     alert(data.message);
-                    location.reload();
+                    loadAccounts();
                 } else {
                     alert(data.message);
                 }
@@ -312,7 +285,7 @@ try {
         .then(data => {
             if (data.status === 'success') {
                 alert(data.message);
-                location.reload();
+                loadAccounts();
             } else {
                 alert(data.message);
             }
