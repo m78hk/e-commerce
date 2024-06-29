@@ -1,5 +1,7 @@
 <?php 
-
+require __DIR__.'/vendor/autoload.php';; 
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Auth;
 include 'database.php';
 include 'functions.php';
 
@@ -19,8 +21,8 @@ $isAdmin = false;
 
 
 if ($isLoggedIn) {
-  echo "User is logged in, UID: " . $_SESSION['user']['uid'];
-  $isAdmin = isAdmin($pdo, $_SESSION['user']['uid']); // Update isAdmin variable
+   //echo "User is logged in, UID: " . $_SESSION['user']['uid'];
+  $isAdmin = isAdmin($pdo, $_SESSION['user']['uid']); 
   echo "User Id" . $_SESSION['user']['uid'] . "is admin: " . $isAdmin;
 } else {
   echo "User is not logged in";
@@ -39,8 +41,13 @@ $email = '';
 $password = '';
 $confirm_password = '';
 
+//firebase initialization
+$factory = (new Factory)->withServiceAccount('/Applications/XAMPP/xamppfiles/htdocs/www/abcshop-web-firebase-adminsdk-g6owf-4eaa080eb8.json')
+->withDatabaseUri('https://abcshop-web-default-rtdb.firebaseio.com/');
 
+$auth = $factory->createAuth();
 
+// registration process
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? ''); 
     $email = trim($_POST['email'] ?? ''); 
@@ -52,31 +59,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } else {
-        $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        // Firebase registration
+        $firebaseUser = $auth->createUserWithEmailAndPassword($email, $password);
 
-        if ($user) {
-            $error = 'Email already registered.';
+        if ($firebaseUser) {
+          // Sync user data to phpMyAdmin database
+          $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, firebase_uid) VALUES (?, ?, ?)');
+          $stmt->execute([$username, $email, $firebaseUser->uid]);
+
+          $_SESSION['user'] = [
+            'uid' => $firebaseUser->uid,
+            'username' => $username,
+            'email' => $email
+          ];
+
+          header('Location: index.php');
+          exit();
         } else {
-            $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE username = ?');
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
-
-            if ($user) {
-                $error = 'Username already taken.';
-            } else {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password) VALUES (?, ?, ?)');
-                $stmt->execute([$username, $email, $hashedPassword]);
-                header('Location: index.php');
-                exit();
-            }
+          $error = 'Failed to register user with Firebase';
         }
     }
 }
 
-
+// Login process
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = trim($_POST['email'] ?? ''); 
   $password = trim($_POST['password'] ?? ''); 
@@ -84,19 +89,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (empty($email) || empty($password)) {
       $error = 'Email and Password are required.';
   } else {
+    // firebase login
+    $firebaseUser = $auth->signInWithEmailAndPassword($email, $password);
+
+    if ($firebaseUser) {
+      //Retrieve user data from phpMyAdmin database
       $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
       $stmt->execute([$email]);
       $user = $stmt->fetch();
 
-      if ($user && password_verify ($password, $user['password'])) {
-          $_SESSION['user'] = $user;
-          $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
-          unset($_SESSION['redirect_to']);
-          header("Location: $redirect");
-          exit();
-      } else {
-          $error = 'Invalid email or password.';
-      }
+      $_SESSION['user'] = [
+        'uid' => $user['firebase_uid'],
+        'username' => $user['username'],
+        'email' => $user['email']
+      ];
+
+      $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
+      unset($_SESSION['redirect_to']);
+      header('Location: ' . $redirect);
+      exit();
+    } else {
+      $error = 'Invalid email or password.';
+    }
   }
 }
 
@@ -119,6 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
+        authDomain: "abcshop-web.firebaseapp.com",
+        projectId: "abcshop-web",
+        storageBucket: "abcshop-web.appspot.com",
+        messagingSenderId: "293629346772",
+        appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
+        measurementId: "G-RNF3QDCT8F"
+      };
+
+      const app = firebase.initializeApp(firebaseConfig);
+      const analytics = firebase.analytics();
+    </script>
     <!--custom css-->
     <link rel="stylesheet" href="./css/style.css">
     <title>ABC SHOPPING MALL</title>
@@ -220,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="modal-body d-flex justify-content-between"> 
         <!-- Login Form -->
         <form id="loginForm" action="#" method="post" class="flex-grow-1 me-3"> 
+        <input type="hidden" name="action" value="login">
         <p>Login</p>  
           <div class="mb-3">
             <label for="loginEmail" class="form-label">Email address</label>
@@ -229,10 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="loginPassword" class="form-label">Password</label>
             <input type="password" class="form-control" id="loginPassword" name="password" required>
           </div>
-          <button type="submit" class="btn btn-primary">Login</button>
+          <button type="submit" class="btn btn-primary" onclick="handleLogin()">Login</button>
         </form>
         <!-- Register Form -->
         <form id="registerForm" action="#" method="post" class="flex-grow-1 ms-3"> 
+        <input type="hidden" name="action" value="register">
           <p>Register</p>  
           <div class="input-group mb-3">
             <input type="text" name="username" class="form-control form-control-lg bg-light fs-6" placeholder="Username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" required>
@@ -252,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </div>
           </div>
           <div class="input-group mb-3">
-              <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">SignUp</button>
+              <button type="submit" class="btn btn-lg btn-primary w-100 fs-6" onclick="handleRegister()">SignUp</button>
           </div>
         </form>
       </div>
@@ -274,6 +304,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="./js/style.js"></script>
 
     <script>
+
+
+
         $(document).ready(function() {
         function openAuthModal() {
           var authModal = new bootstrap.Modal(document.getElementById('authModal'), {
@@ -343,19 +376,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         });
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
-          authDomain: "abcshop-web.firebaseapp.com",
-          projectId: "abcshop-web",
-          storageBucket: "abcshop-web.appspot.com",
-          messagingSenderId: "293629346772",
-          appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
-          measurementId: "G-RNF3QDCT8F"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.firestore();
     </script>
   </body>
 </html>

@@ -10,7 +10,7 @@
         <a href="./contact us.php">
         <button type = "button" class="btn m-2 text-bg-white">contact us</button>
         </a>
-        <a href="./maps.html">
+        <a href="./maps.php">
         <button type = "button" class="btn m-2 text-bg-white">map</button>
         </a>
       </div>

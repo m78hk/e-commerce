@@ -18,7 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             addToCart($product_id);
         }
+    } else {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Product ID is required']);
     }
+} else {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
 }
 
 function updateCart($product_id, $quantity) {
@@ -26,10 +32,12 @@ function updateCart($product_id, $quantity) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             $item['quantity'] = $quantity;
             $_SESSION['cart_quantity'] = getCartQuantity();
+            http_response_code(200);
             echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
             exit;
         }
     }
+    http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Product not found']);
 }
 
@@ -38,16 +46,19 @@ function removeFromCart($product_id) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
             unset($_SESSION['cart'][$key]);
             $_SESSION['cart_quantity'] = getCartQuantity();
+            http_response_code(200);
             echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
             exit;
         }
     }
+    http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => 'Product not found']);
 }
 
 function addToCart($product_id) {
     foreach ($_SESSION['cart'] as $item) {
         if (isset($item['product_id']) && $item['product_id'] == $product_id) {
+            http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Product already in cart']);
             return;
         }
@@ -67,8 +78,10 @@ function addToCart($product_id) {
             'quantity' => 1
         ];
         $_SESSION['cart_quantity'] = getCartQuantity();
+        http_response_code(200);
         echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
     } else {
+        http_response_code(404);
         echo json_encode(['status' => 'error', 'message' => 'Product not found']);
     }
 }
