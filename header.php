@@ -42,43 +42,50 @@ $password = '';
 $confirm_password = '';
 
 //firebase initialization
-$factory = (new Factory)->withServiceAccount('/Applications/XAMPP/xamppfiles/htdocs/www/abcshop-web-firebase-adminsdk-g6owf-4eaa080eb8.json')
+$factory = (new Factory)->withServiceAccount('/Applications/XAMPP/xamppfiles/htdocs/www/abcshop-web-firebase-adminsdk-g6owf-2bf2fb76ed.json')
 ->withDatabaseUri('https://abcshop-web-default-rtdb.firebaseio.com/');
 
 $auth = $factory->createAuth();
 
 // registration process
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? ''); 
-    $email = trim($_POST['email'] ?? ''); 
-    $password = trim($_POST['password'] ?? ''); 
-    $confirm_password = trim($_POST['confirm_password'] ?? ''); 
+  $username = trim($_POST['username'] ?? ''); 
+  $email = trim($_POST['email'] ?? ''); 
+  $password = trim($_POST['password'] ?? ''); 
+  $confirm_password = trim($_POST['confirm_password'] ?? ''); 
 
-    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        $error = 'All fields are required.';
-    } elseif ($password !== $confirm_password) {
-        $error = 'Passwords do not match.';
-    } else {
-        // Firebase registration
-        $firebaseUser = $auth->createUserWithEmailAndPassword($email, $password);
+  if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+      $error = 'All fields are required.';
+  } elseif ($password !== $confirm_password) {
+      $error = 'Passwords do not match.';
+  } else {
+      try {
+          // Firebase registration
+          $firebaseUser = $auth->createUserWithEmailAndPassword($email, $password);
 
-        if ($firebaseUser) {
-          // Sync user data to phpMyAdmin database
-          $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, firebase_uid) VALUES (?, ?, ?)');
-          $stmt->execute([$username, $email, $firebaseUser->uid]);
+          // Handle successful registration
+          if ($firebaseUser) {
+              // Sync user data to phpMyAdmin database
+              $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password, firebase_uid) VALUES (?, ?, ?, ?)');
+              $stmt->execute([$username, $email, $hashed_password, $firebaseUser->uid]);
 
-          $_SESSION['user'] = [
-            'uid' => $firebaseUser->uid,
-            'username' => $username,
-            'email' => $email
-          ];
+              $_SESSION['user'] = [
+                  'uid' => $firebaseUser->uid,
+                  'username' => $username,
+                  'email' => $email,
+              ];
 
-          header('Location: index.php');
-          exit();
-        } else {
-          $error = 'Failed to register user with Firebase';
-        }
-    }
+              header('Location: index.php');
+              exit();
+          } else {
+              $error = 'Failed to register user with Firebase';
+          }
+      } catch (\Kreait\Firebase\Exception\Auth\EmailExists $e) {
+          $error = 'The email address is already in use by another account.';
+      } catch (Exception $e) {
+          $error = 'Registration failed: ' . $e->getMessage();
+      }
+  }
 }
 
 // Login process
@@ -98,18 +105,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute([$email]);
       $user = $stmt->fetch();
 
-      $_SESSION['user'] = [
-        'uid' => $user['firebase_uid'],
-        'username' => $user['username'],
-        'email' => $user['email']
-      ];
+      if ($user) {
+        $_SESSION['user'] = [
+          'uid' => $user['firebase_uid'],
+          'username' => $user['username'],
+          'email' => $user['email'],
+          'phone' => $user['phone'],
+          'address' => $user['address'],
+          'payment_info' => $user['payment_info']
+        ];
+      
 
       $redirect = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
       unset($_SESSION['redirect_to']);
       header('Location: ' . $redirect);
       exit();
     } else {
-      $error = 'Invalid email or password.';
+      $error = 'User not found in database.';
+    }
+  } else {
+    $error = 'Invalid email or password.';
     }
   }
 }
@@ -124,29 +139,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--fontawesome cdn-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!--bootstrap css-->    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/bootstrap-5.3.0-dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Firebase JavaScript SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
-        authDomain: "abcshop-web.firebaseapp.com",
-        projectId: "abcshop-web",
-        storageBucket: "abcshop-web.appspot.com",
-        messagingSenderId: "293629346772",
-        appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
-        measurementId: "G-RNF3QDCT8F"
-      };
-
-      const app = firebase.initializeApp(firebaseConfig);
-      const analytics = firebase.analytics();
-    </script>
+  
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js"></script>
     <!--custom css-->
     <link rel="stylesheet" href="./css/style.css">
     <title>ABC SHOPPING MALL</title>
@@ -258,8 +261,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="loginPassword" class="form-label">Password</label>
             <input type="password" class="form-control" id="loginPassword" name="password" required>
           </div>
-          <button type="submit" class="btn btn-primary" onclick="handleLogin()">Login</button>
+          <button type="submit" class="btn btn-primary" onclick="handleLogin()">Login</button><br>
+          <br>
+          <div class="mb-3">
+            <button id="google-login-btn" type="button" class="btn btn-google icon-google" onclick="handleGoogleLogin()" style="font-size: 24px; color: #db4437;"><i class="fab fa-google"></i></button> 
+            <!-- <button id="facebook-login-btn" type="button" class="btn btn-facebook icon-facebook" onclick="handleFacebookLogin()" style="font-size: 24px; color: #4267B2;"><i class="fab fa-facebook"></i></button> -->
+          </div>
         </form>
+        
         <!-- Register Form -->
         <form id="registerForm" action="#" method="post" class="flex-grow-1 ms-3"> 
         <input type="hidden" name="action" value="register">
@@ -302,11 +311,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
 <!--custom js-->
 <script src="./js/style.js"></script>
+<script type="module" src="./js/firebase.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
+<script>
+// firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
+    authDomain: "abcshop-web.firebaseapp.com",
+    projectId: "abcshop-web",
+    storageBucket: "abcshop-web.appspot.com",
+    messagingSenderId: "293629346772",
+    appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
+    measurementId: "G-RNF3QDCT8F"
+  };
+  // Firebase initialization
+  firebase.initializeApp(firebaseConfig);
 
-    <script>
+  // Google login
+  function handleGoogleLogin() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth()
+      .signInWithPopup(provider)
+      .then((result) => {
+        var user = result.user;
+        var uid = user.uid;
+        var displayName = user.displayName;
+        var email = user.email;
+        
+        // login success
+        $.ajax({
+          url: 'google_login.php',
+          method: 'POST',
+          data: {
+            uid: uid,
+            displayName: displayName,
+            email: email
+          },
+          success: function(response) {
+            console.log('Google login success', response);
+            window.location.reload();
+          },
+          error: function(error) {
+            console.error('Failed to login with Google', error);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Google login failed', error);
+      });
+  }   
 
 
+  // Facebook login
+  function handleFacebookLogin() {
+    var provider = new firebase.auth.FacebookAuthProvider();
+    firebase.auth()
+      .signInWithPopup(provider)
+      .then((result) => {
+        var user = result.user;
+        var uid = user.uid;
+        var email = user.email;
+        var displayName = user.displayName;
+ 
+        // login success
+        $.ajax({
+          url: 'facebook_login.php',
+          method: 'POST',
+          data: {
+            uid: uid,
+            displayName: displayName,
+            email: email
+          },
+          success: function(response) {
+            console.log('Facebook login success', response);
+            var responseData = JSON.parse(response);
+            $('#user-name-display').text(response.displayName); 
+            window.location.reload();
+          },
+          error: function(error) {
+            console.error('Failed to login with Facebook', error);
+          }
+        })
+      });
+  }
 
+  // show user details
+  function showUserName(userName) {
+    var userElement = document.getElementById('userNameElement'); 
+    if (userElement) {
+        userElement.textContent = userName; 
+    }
+  }
+
+ 
         $(document).ready(function() {
         function openAuthModal() {
           var authModal = new bootstrap.Modal(document.getElementById('authModal'), {
