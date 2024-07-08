@@ -123,10 +123,10 @@ function addToCart(productId) {
     if (xhr.readyState === 4 && xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
       if (response.status === 'success') {
-          document.getElementById('cart-feedback').innerHTML = 'Product added to cart';
+          document.getElementById('cart-feedback').innerHTML = '';
           updateCartCount(response.totalQuantity);
       } else {
-          document.getElementById('cart-feedback').innerHTML = 'Failed to add product to cart';
+          document.getElementById('cart-feedback').innerHTML = '';
         }
       }
     };

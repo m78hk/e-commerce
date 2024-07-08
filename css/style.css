@@ -14,7 +14,7 @@ body{
 .bg-primary{
     background-color: var(--pink)!important;
 }
- /*
+ 
 .btn:not(.nav-btns button):not(.user-btn){
     background-color: rgba(0, 0, 0, 0);
     color: rgb(85, 85, 85);
@@ -36,7 +36,6 @@ body{
     border-color:var(--pink);
 }
 
-*/
 
 
 

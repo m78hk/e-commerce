@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 02, 2024 at 01:01 PM
+-- Generation Time: Jul 08, 2024 at 02:27 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,17 +40,18 @@ CREATE TABLE IF NOT EXISTS `tb_accounts` (
   `is_admin` tinyint(1) DEFAULT 0,
   `firebase_uid` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_accounts`
 --
 
 INSERT INTO `tb_accounts` (`uid`, `username`, `password`, `email`, `phone`, `address`, `payment_info`, `role`, `is_admin`, `firebase_uid`) VALUES
-(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '123456789', 'abcd1213', '987654321', 'user', 1, ''),
+(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '123456789', 'abcd1213', '98765432', 'admin', 1, ''),
 (12, 'customer1', '$2y$10$TU1h.mSvVZ3oPTE4.KV5L.HYV38SYvvNvGYXCTlq8h2kXUHaWE/Ri', 'qwe@qwe.com', '987654321', '', '', 'user', 0, ''),
 (14, 'customer 3', '$2y$10$nBmOodFRSaqic6yGnWyAOeuKCcESyq8qhJeMtiwvDlutqwAVVcSKi', 'm78.roy.mo@gmail.com', NULL, NULL, NULL, 'user', 0, ''),
-(15, 'customer 7', '$2y$10$EQuwJ1dUtCK0Hu75Akh0w.KSl4PTR8ifyFHLfl6bJbMfIDlDxSoXG', 'cvb@cvb.com', '0123456789', 'null', 'null', 'user', 0, 'HpwjQDNWZfXv1zkYntspdOPURCv1');
+(15, 'customer 7', '$2y$10$EQuwJ1dUtCK0Hu75Akh0w.KSl4PTR8ifyFHLfl6bJbMfIDlDxSoXG', 'cvb@cvb.com', '123456', 'abc', '1234', 'user', 0, 'HpwjQDNWZfXv1zkYntspdOPURCv1'),
+(16, 'csutomer 8', '123456', 'xcv@xcv.com', '1234567', 'def', '1234', 'user', 0, 'hPcBWZ7MCIUpC6NQOCq8GGDfqyv2');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

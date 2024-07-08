@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password'])) {
         if ($user['is_admin'] == 1) {
-            $_SESSION['admin_user'] = $user;
+            $_SESSION['user'] = $user;
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'You are not an admin']);

@@ -18,6 +18,18 @@ $cartQuantity = getCartQuantity();
 $isLoggedIn = isset($_SESSION['user']);
 $isAdmin = false;
 
+$_SESSION['isAdminLoggedIn'] = true;
+
+$_SESSION['isUserLoggedIn'] = true;
+
+if (isset($_SESSION['isUserLoggedIn']) && $_SESSION['isUserLoggedIn'] == true) {
+  echo "User is logged in";
+} 
+
+if (isset($_SESSION['isAdminLoggedIn']) && $_SESSION['isAdminLoggedIn'] == true) {
+  echo "Admin is logged in";
+}
+
 
 
 if ($isLoggedIn) {
@@ -60,26 +72,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $error = 'Passwords do not match.';
   } else {
       try {
+          // Hash password
+          $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
           // Firebase registration
           $firebaseUser = $auth->createUserWithEmailAndPassword($email, $password);
 
           // Handle successful registration
           if ($firebaseUser) {
-              // Sync user data to phpMyAdmin database
-              $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password, firebase_uid) VALUES (?, ?, ?, ?)');
-              $stmt->execute([$username, $email, $hashed_password, $firebaseUser->uid]);
-
-              $_SESSION['user'] = [
-                  'uid' => $firebaseUser->uid,
-                  'username' => $username,
-                  'email' => $email,
-              ];
-
-              header('Location: index.php');
-              exit();
-          } else {
-              $error = 'Failed to register user with Firebase';
-          }
+            // 插入資料到本地數據庫的 tb_accounts 表
+            $stmt = $pdo->prepare('INSERT INTO general_user (username, email, password, firebase_uid) VALUES (?, ?, ?, ?)');
+            $success = $stmt->execute([$username, $email, $hashed_password, $firebaseUser->uid]);
+        
+            if ($success) {
+                // 設置 session 或進行重定向等後續操作
+                $_SESSION['user'] = [
+                    'uid' => $firebaseUser->uid,
+                    'username' => $username,
+                    'email' => $email,
+                ];
+        
+                header('Location: index.php');
+                exit();
+            } else {
+                // 處理數據庫插入錯誤
+                $error = 'Failed to insert user data into tb_accounts.';
+            }
+        } else {
+            $error = 'Failed to register user with Firebase';
+        }
       } catch (\Kreait\Firebase\Exception\Auth\EmailExists $e) {
           $error = 'The email address is already in use by another account.';
       } catch (Exception $e) {
@@ -101,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($firebaseUser) {
       //Retrieve user data from phpMyAdmin database
-      $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
+      $stmt = $pdo->prepare('SELECT * FROM general_user WHERE email = ?');
       $stmt->execute([$email]);
       $user = $stmt->fetch();
 

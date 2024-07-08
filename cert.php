@@ -131,6 +131,8 @@ include 'header.php';
         cartIconQuantityElement.textContent = quantity;
     }
 
+    
+
     </script>
 </body>
 <!--end of header-->

@@ -4,7 +4,7 @@ include 'database.php';
 
 
 if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -22,10 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (!empty($_POST['password'])) {
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, password = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
+            $stmt = $pdo->prepare('UPDATE general_user SET email = ?, password = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
             $success = [$email, $password, $phone, $address, $payment_info, $userId];
         } else {
-            $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
+            $stmt = $pdo->prepare('UPDATE general_user SET email = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
             $success = [$email, $phone, $address, $payment_info, $userId];
         }
 

@@ -77,8 +77,8 @@ function addToCart($product_id) {
             'image' => $product['image'],
             'quantity' => 1
         ];
-        $_SESSION['cart_quantity'] = getCartQuantity();
-        http_response_code(200);
+        $stmt = $pdo->prepare('INSERT INTO cart (product_id, product_name, price, image) VALUES (?, ?, ?, ?)');
+        $stmt->execute([$product['product_id'], $product['product_name'], $product['price'], $product['image']]);
         echo json_encode(['status' => 'success', 'cartQuantity' => $_SESSION['cart_quantity']]);
     } else {
         http_response_code(404);
