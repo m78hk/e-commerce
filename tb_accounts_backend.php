@@ -194,20 +194,86 @@
 </style>
 <script>
 
-document.getElementById('add-account-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+function deleteAccount(uid) {
+        if (confirm('Are you sure you want to delete this account?')) {
+            fetch('api/get_account.php', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `uid=${uid}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    loadAccounts();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
 
+    function loadAccounts() {
         fetch('api/get_account.php', {
-            method: 'POST',
-            body: formData,
+            method: 'GET',
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);
             if (data.status === 'success') {
+                const accounts = data.accounts;
+                const tbody = document.querySelector('#accounts-table tbody');
+                tbody.innerHTML = '';
+                accounts.forEach(account => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${account.uid}</td>
+                        <td>${account.username}</td>
+                        <td>${account.email}</td>
+                        <td>${account.phone}</td>
+                        <td>${account.address}</td>
+                        <td>${account.payment_info}</td>
+                        <td>${account.role}</td>
+                        <td>${account.is_admin ? 'Yes' : 'No'}</td>
+                        <td>
+                            <button onclick="editAccount(${account.uid})">Edit</button>
+                            <form class="delete-account-form" data-id="${account.uid}" style="display:inline;">
+                                <input type="hidden" name="action" value="delete_account">
+                                <input type="hidden" name="uid" value="${account.uid}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                alert('Failed to load accounts: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    
+    window.onload = loadAccounts;
+
+    
+    document.getElementById('add-account-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('api/get_account.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
                 loadAccounts();
-                this.reset();
+            } else {
+                alert(data.message);
             }
         })
         .catch(error => console.error('Error:', error));
@@ -238,28 +304,48 @@ document.getElementById('add-account-form').addEventListener('submit', function 
     }
 
     function editAccount(uid) {
-        fetch(`api/get_account.php?action=get_account&uid=${uid}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const account = data.account;
-                    document.getElementById('edit-account-uid').value = account.uid;
-                    document.getElementById('edit-account-username').value = account.username;
-                    document.getElementById('edit-account-password').value = '';
-                    document.getElementById('edit-account-email').value = account.email;
-                    document.getElementById('edit-account-phone').value = account.phone;
-                    document.getElementById('edit-account-address').value = account.address;
-                    document.getElementById('edit-account-payment-info').value = account.payment_info;
-                    document.getElementById('edit-account-role').value = account.role;
-                    document.getElementById('edit-account-is-admin').checked = account.is_admin;
-                    document.getElementById('edit-account-modal').style.display = 'block';
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+    var row = document.querySelector(`button[onclick="editAccount(${uid})"]`).closest('tr');
+    if (!row) {
+        console.error(`Row not found for uid ${uid}`);
+        return;
     }
 
+    document.getElementById('edit-account-uid').value = uid;
+    document.getElementById('edit-account-username').value = row.children[1].innerText;
+    document.getElementById('edit-account-email').value = row.children[2].innerText;
+    document.getElementById('edit-account-phone').value = row.children[3].innerText;
+    document.getElementById('edit-account-address').value = row.children[4].innerText;
+    document.getElementById('edit-account-payment-info').value = row.children[5].innerText;
+    document.getElementById('edit-account-role').value = row.children[6].innerText;
+    document.getElementById('edit-account-is-admin').checked = row.children[7].innerText === 'Yes';
+
+    document.getElementById('edit-account-modal').style.display = 'block';
+}
+    function closeEditModal() {
+        document.getElementById('edit-account-modal').style.display = 'none';
+    }
+
+    document.getElementById('edit-account-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('api/get_account.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                loadAccounts();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    
     function deleteAccount(uid) {
         if (confirm('Are you sure you want to delete this account?')) {
             fetch('api/get_account.php', {
@@ -280,32 +366,6 @@ document.getElementById('add-account-form').addEventListener('submit', function 
         }
     }
 
-    function closeEditModal() {
-        document.getElementById('edit-account-modal').style.display = 'none';
-    }
-
-    document.getElementById('edit-account-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch('api/get_account.php', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            if (data.status === 'success') {
-                loadAccounts();
-                closeEditModal();
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
-    window.onload = function () {
-        loadAccounts();
-    }
 
 </script>
 </html>
