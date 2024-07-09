@@ -16,11 +16,11 @@ if (!isset($_SESSION['checklist'])) {
 $cartQuantity = getCartQuantity();
 
 $isLoggedIn = isset($_SESSION['user']);
-$isAdmin = false;
+$isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
 
-$_SESSION['isAdminLoggedIn'] = true;
+$_SESSION['isAdminLoggedIn'] = $isAdmin;
 
-$_SESSION['isUserLoggedIn'] = true;
+$_SESSION['isUserLoggedIn'] = $isLoggedIn;
 
 if (isset($_SESSION['isUserLoggedIn']) && $_SESSION['isUserLoggedIn'] == true) {
   echo "User is logged in";
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             } else {
                 // 處理數據庫插入錯誤
-                $error = 'Failed to insert user data into tb_accounts.';
+                $error = 'Failed to insert user data into generl_user.';
             }
         } else {
             $error = 'Failed to register user with Firebase';

@@ -13,13 +13,14 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['uid'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['address'], $_POST['phone'], $_POST['payment_info'])) {
+    if (isset($_POST['address'], $_POST['phone'], $_POST['payment_info'], $_POST['payment_method'])) {
         $address = trim($_POST['address']);
         $phone = trim($_POST['phone']);
         $payment_info = trim($_POST['payment_info']);
+        $payment_method = trim($_POST['payment_method']);
 
-        $stmt = $pdo->prepare('UPDATE tb_accounts SET address = ?, phone = ?, payment_info = ? WHERE uid = ?');
-        if ($stmt->execute([$address, $phone, $payment_info, $userId])) {
+        $stmt = $pdo->prepare('UPDATE tb_accounts SET address = ?, phone = ?, payment_info = ?, payment_method WHERE uid = ?');
+        if ($stmt->execute([$address, $phone, $payment_info, $payment_method, $userId])) {
             echo 'Information saved successfully.';
         } else {
             echo 'Failed to save information.';
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['address'] = $address;
         $_SESSION['phone'] = $phone;
         $_SESSION['payment_info'] = $payment_info;
+        $_SESSION['payment_method'] = $payment_method;
     }
 
     if (isset($_POST['subtotal'], $_POST['tax'], $_POST['shipping'], $_POST['total'], $_POST['cart'])) {
@@ -53,10 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['address'] = $user['address'] ?? '';
         $_SESSION['phone'] = $user['phone'] ?? '';
         $_SESSION['payment_info'] = $user['payment_info'] ?? '';
+        $_SESSION['payment_method'] = $user['payment_method'] ?? '';
     } else {
         $_SESSION['address'] = '';
         $_SESSION['phone'] = '';
         $_SESSION['payment_info'] = '';
+        $_SESSION['payment_method'] = '';
     }
 
     $_SESSION['subtotal'] = $_SESSION['subtotal'] ?? 0;
@@ -68,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = $_SESSION['address'] ?? '';
     $phone = $_SESSION['phone'] ?? '';
     $payment_info = $_SESSION['payment_info'] ?? '';
+    $payment_method = $_SESSION['payment_method'] ?? '';
 
     $subtotal = $_SESSION['subtotal'] ?? 0;
     $tax = $_SESSION['tax'] ?? 0;
@@ -91,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-6">
                 <h3>Your Cart:</h3>
                 <?php foreach ($_SESSION['cart'] as $item): ?>
-                    <?php if (isset($item['product_id']) && isset($products[$item['product_id']], $products[$item['product_id']]['product_name'])): ?>
+                    <?php if (isset($item['product_id']) && isset($products[$item['product_id']], 
+                    $products[$item['product_id']]['product_name'])): ?>
                         <?php $product = $products[$item['product_id']]; ?>
                         <div class="cart-item d-flex align-items-center">
                             <img src="data:image/jpeg;base64,<?php echo base64_encode($product['image']); ?>" 
@@ -112,39 +118,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3>User Information:</h3>
                     <div class="mb-3">
                         <label for="username" class="form-label">Username:</label>
-                        <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($_SESSION['user']['username'] ?? ''); ?>" readonly>
+                        <input type="text" class="form-control" id="username" name="username" 
+                        value="<?php echo htmlspecialchars($_SESSION['user']['username'] ?? ''); ?>" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="Phone" class="form-label">Phone No:</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($_SESSION['user']['phone'] ?? ''); ?>" readonly>
+                        <input type="text" class="form-control" id="phone" name="phone" 
+                        value="<?php echo htmlspecialchars($_SESSION['user']['phone'] ?? ''); ?>" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="address" class="form-label">Address:</label>
-                        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? ''); ?>" readonly>
+                        <input type="text" class="form-control" id="address" name="address" 
+                        value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? ''); ?>" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="payment_info" class="form-label">Payment Information:</label>
-                        <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo htmlspecialchars($_SESSION['user']['payment_info'] ?? ''); ?>" readonly>
-                    </div> 
+                        <label for="payment_method" class="form-label">Payment Method:</label>
+                        <input type="text" class="form-control" id="payment_method" name="payment_method" 
+                        value="<?php echo htmlspecialchars($_SESSION['user']['payment_method'] ?? ''); ?>" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_info" class="form-label">Credit Card Information:</label>
+                        <input type="text" class="form-control" id="payment_info" name="payment_info" 
+                        value="<?php echo htmlspecialchars($_SESSION['user']['payment_info'] ?? ''); ?>" readonly>
+                    </div>
                 </div>
 
                 <br>
                 <form method="POST" class="right-bar" action="pay.php">
                     <div class="mb-3">
                         <label for="subtotal" class="form-label">Subtotal:</label>
-                        <input type="text" class="form-control" id="subtotal" name="subtotal" value="<?php echo htmlspecialchars($subtotal); ?>" readonly>
+                        <input type="text" class="form-control" id="subtotal" name="subtotal" 
+                        value="<?php echo htmlspecialchars($subtotal); ?>" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="tax" class="form-label">Tax:</label>
-                        <input type="text" class="form-control" id="tax" name="tax" value="<?php echo htmlspecialchars($tax); ?>" readonly>
+                        <input type="text" class="form-control" id="tax" name="tax" 
+                        value="<?php echo htmlspecialchars($tax); ?>" readonly>
                      </div>
                     <div class="mb-3">
                         <label for="shipping" class="form-label">Shipping:</label>
-                        <input type="text" class="form-control" id="shipping" name="shipping" value="<?php echo htmlspecialchars($shipping); ?>" readonly>
+                        <input type="text" class="form-control" id="shipping" name="shipping" 
+                        value="<?php echo htmlspecialchars($shipping); ?>" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="total" class="form-label">Total:</label>
-                        <input type="text" class="form-control" id="total" name="total" value="<?php echo htmlspecialchars($total); ?>" readonly>
+                        <input type="text" class="form-control" id="total" name="total" 
+                        value="<?php echo htmlspecialchars($total); ?>" readonly>
                     </div>
                     <button type="submit" class="btn btn-success">Buy</button>
                 </form>

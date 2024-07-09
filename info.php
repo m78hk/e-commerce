@@ -67,15 +67,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Phone No:</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars(isset($_SESSION['user']['phone']) ? $_SESSION['user']['phone'] : ''); ?>" required>
+            <input type="text" class="form-control" id="phone" name="phone" 
+            value="<?php echo htmlspecialchars(isset($_SESSION['user']['phone']) ? $_SESSION['user']['phone'] : ''); ?>" required>
         </div>
         <div class="mb-3">
             <label for="address" class="form-label">Address:</label>
-            <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars(isset($_SESSION['user']['address']) ? $_SESSION['user']['address'] : ''); ?>" required>
+            <input type="text" class="form-control" id="address" name="address" 
+            value="<?php echo htmlspecialchars(isset($_SESSION['user']['address']) ? $_SESSION['user']['address'] : ''); ?>" required>
         </div>
         <div class="mb-3">
-            <label for="payment_info" class="form-label">Payment Information:</label>
-            <input type="text" class="form-control" id="payment_info" name="payment_info" value="<?php echo htmlspecialchars(isset($_SESSION['user']['payment_info']) ? $_SESSION['user']['payment_info'] : ''); ?>" required>
+            <label for="payment_info" class="form-label">Payment Method:</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="visa" name="payment_method" 
+                value="Visa" <?php echo (isset($_SESSION['user']['payment_method']) && $_SESSION['user']['payment_method'] === 'Visa') ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="visa">Visa</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="master" name="payment_method" 
+                value="Master" <?php echo (isset($_SESSION['user']['payment_method']) && $_SESSION['user']['payment_method'] === 'Master') ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="master">MasterCard</label>
+            </div>
+            <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="paypal" name="payment_method" 
+            value="PayPal" <?php echo (isset($_SESSION['user']['payment_method']) && $_SESSION['user']['payment_method'] === 'PayPal') ? 'checked' : ''; ?>>
+            <label class="form-check-label" for="paypal">PayPal</label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="payment_info" class="form-label">Credit Card Information:</label>
+            <input type="text" class="form-control" id="payment_info" 
+            name="payment_info" value="<?php echo htmlspecialchars(isset($_SESSION['user']['payment_info']) ? $_SESSION['user']['payment_info'] : ''); ?>" required>
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

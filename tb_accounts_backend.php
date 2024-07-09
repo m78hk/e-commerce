@@ -34,11 +34,23 @@
         <label>Address:</label>
         <input type="text" name="address"><br>
         <br>
-        <label>Payment Info:</label>
-        <input type="text" name="payment_info"><br>
+        <label>Payment Method:</label>
+        <select name="payment_method" id="edit-account-payment-method">
+                <option value="visa">Visa</option>
+                <option value="master">Master</option>
+                <option value="paypal">Paypal</option>
+        </select>    
+        <br>
+        <br>
+        <label>Credit Card:</label>
+        <input type="text" name="credit_card"><br>
         <br>
         <label>Role:</label>
-        <input type="text" name="role" required><br>
+        <select name="role" id="edit-account-role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+        </select>
+        <br>
         <br>
         <label>Is Admin:</label>
         <input type="checkbox" name="is_admin"><br>
@@ -55,7 +67,8 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Address</th>
-                <th>Payment Info</th>
+                <th>Payment Method</th>
+                <th>Credit Card</th>
                 <th>Role</th>
                 <th>Is Admin</th>
                 <th>Actions</th>
@@ -89,7 +102,8 @@
                         <td><?= htmlspecialchars($account['email']) ?></td>
                         <td><?= htmlspecialchars($account['phone']) ?></td>
                         <td><?= htmlspecialchars($account['address']) ?></td>
-                        <td><?= htmlspecialchars($account['payment_info']) ?></td>
+                        <td><?= htmlspecialchars($account['payment_method']) ?></td>
+                        <td><?= htmlspecialchars($account['credit_card']) ?></td>
                         <td><?= htmlspecialchars($account['role']) ?></td>
                         <td><?= htmlspecialchars($account['is_admin'] ? 'Yes' : 'No') ?></td>
                         <td>
@@ -127,10 +141,19 @@
             <input type="text" name="phone" id="edit-account-phone"><br>
             <label>Address:</label>
             <input type="text" name="address" id="edit-account-address"><br>
-            <label>Payment Info:</label>
-            <input type="text" name="payment_info" id="edit-account-payment-info"><br>
+            <label>Payment Method:</label>
+            <select name="payment_method" id="edit-account-payment-method">
+                <option value="visa">Visa</option>
+                <option value="master">Master</option>
+                <option value="paypal">Paypal</option>
+            </select><br>
+            <label>Credit Card:</label><br>
+            <input type="text" name="credit_card" id="edit-account-credit-card"><br>
             <label>Role:</label>
-            <input type="text" name="role" id="edit-account-role" required><br>
+            <select name="role" id="edit-account-role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select><br>
             <label>Is Admin:</label>
             <input type="checkbox" name="is_admin" id="edit-account-is-admin"><br>
             <button type="submit">Save Changes</button>
@@ -234,7 +257,8 @@ function deleteAccount(uid) {
                         <td>${account.email}</td>
                         <td>${account.phone}</td>
                         <td>${account.address}</td>
-                        <td>${account.payment_info}</td>
+                        <td>${account.payment_method}</td>
+                        <td>${account.credit_card}</td>
                         <td>${account.role}</td>
                         <td>${account.is_admin ? 'Yes' : 'No'}</td>
                         <td>
@@ -293,10 +317,11 @@ function deleteAccount(uid) {
                     row.insertCell(2).textContent = account.email;
                     row.insertCell(3).textContent = account.phone;
                     row.insertCell(4).textContent = account.address;
-                    row.insertCell(5).textContent = account.payment_info;
-                    row.insertCell(6).textContent = account.role;
-                    row.insertCell(7).textContent = account.is_admin ? 'Yes' : 'No';
-                    const actionsCell = row.insertCell(8);
+                    row.insertCell(5).textContent = account.payment_method;
+                    row.insertCell(6).textContent = account.credit_card;
+                    row.insertCell(7).textContent = account.role;
+                    row.insertCell(8).textContent = account.is_admin ? 'Yes' : 'No';
+                    const actionsCell = row.insertCell(9);
                     actionsCell.innerHTML = `<button onclick="editAccount(${account.uid})">Edit</button> <button onclick="deleteAccount(${account.uid})">Delete</button>`;
                 });
             })
@@ -315,9 +340,10 @@ function deleteAccount(uid) {
     document.getElementById('edit-account-email').value = row.children[2].innerText;
     document.getElementById('edit-account-phone').value = row.children[3].innerText;
     document.getElementById('edit-account-address').value = row.children[4].innerText;
-    document.getElementById('edit-account-payment-info').value = row.children[5].innerText;
-    document.getElementById('edit-account-role').value = row.children[6].innerText;
-    document.getElementById('edit-account-is-admin').checked = row.children[7].innerText === 'Yes';
+    document.getElementById('edit-account-payment-method').value = row.children[5].innerText;
+    document.getElementById('edit-account-credit-card').value = row.children[6].innerText;
+    document.getElementById('edit-account-role').value = row.children[7].innerText;
+    document.getElementById('edit-account-is-admin').checked = row.children[8].innerText === 'Yes';
 
     document.getElementById('edit-account-modal').style.display = 'block';
 }

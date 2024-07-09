@@ -15,6 +15,7 @@ $username = $_SESSION['user']['username'] ?? '';
 $address = $_SESSION['user']['address'] ?? '';
 $phone = $_SESSION['user']['phone'] ?? '';
 $payment_info = $_SESSION['user']['payment_info'] ?? '';
+$payment_method = $_SESSION['user']['payment_method'] ?? '';
 $subtotal = $_SESSION['subtotal'] ?? 0;
 $tax = $_SESSION['tax'] ?? 0;
 $shipping = $_SESSION['shipping'] ?? 0;
@@ -41,7 +42,7 @@ $pdf->SetFont('Arial', '', 12);
 $pdf->Cell(0, 10, 'Username: ' . $username, 0, 1);
 $pdf->Cell(0, 10, 'Phone: ' . $phone, 0, 1);
 $pdf->Cell(0, 10, 'Address: ' . $address, 0, 1);
-$pdf->Cell(0, 10, 'Payment Info: ' . $payment_info, 0, 1);
+$pdf->Cell(0, 10, 'Payment Method: ' . $payment_method, 0, 1);
 
 // retrieve order information
 $pdf->Cell(0, 10, 'Subtotal: $' . $subtotal, 0, 1);

@@ -98,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .then(data => {
             if (data.status === 'success') {
                 window.location.href = 'tb_accounts_backend.php';
+                window.location.href = 'supermarket_backend.php';
             } else {
                 document.getElementById('error-message').textContent = data.message;
             }
