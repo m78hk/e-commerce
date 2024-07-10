@@ -13,28 +13,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_SESSION['user']['uid'];
 
     
-    if (isset($_POST['email'], $_POST['phone'], $_POST['address'], $_POST['payment_info'])) {
+    if (isset($_POST['email'], $_POST['phone'], $_POST['address'], $_POST['payment_method'], $_POST['credit_card'])) {
         $email = trim($_POST['email']);
         $phone = trim($_POST['phone']);
         $address = trim($_POST['address']);
-        $payment_info = trim($_POST['payment_info']);
+        $payment_info = trim($_POST['payment_method']);
+        $credit_card = trim($_POST['credit_card']);
 
         
         if (!empty($_POST['password'])) {
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('UPDATE general_user SET email = ?, password = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
-            $success = [$email, $password, $phone, $address, $payment_info, $userId];
+            $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, password = ?, phone = ?, address = ?, payment_method = ?, credit_card =? WHERE uid = ?');
+            $success = [$email, $password, $phone, $address, $payment_method, $credit_card, $userId];
         } else {
-            $stmt = $pdo->prepare('UPDATE general_user SET email = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
-            $success = [$email, $phone, $address, $payment_info, $userId];
+            $stmt = $pdo->prepare('UPDATE tb_accounts  SET email = ?, password = ?, phone = ?, address = ?, payment_method = ?, credit_card =? WHERE uid = ?');
+            $success = [$email, $password, $phone, $address, $payment_method, $credit_card, $userId];
         }
 
         if ($success) {
+            echo "<script>alert('Information updated successfully');</script>";
             echo 'Information updated successfully';
             $_SESSION['user']['email'] = $email;
             $_SESSION['user']['phone'] = $phone;
             $_SESSION['user']['address'] = $address;
-            $_SESSION['user']['payment_info'] = $payment_info;
+            $_SESSION['user']['payment_method'] = $payment_method;
+            $_SESSION['user']['credit_card'] = $credit_card;
             if (!empty($_POST['password'])) {
                 $_SESSION['user']['password'] = $password;
             }
@@ -49,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include 'header.php'; ?>
 <!--end of header-->
 
-<!-- 表單部分 -->
+<!--form -->
 <div class="container mt-5">
     <br>
     <br>
@@ -76,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             value="<?php echo htmlspecialchars(isset($_SESSION['user']['address']) ? $_SESSION['user']['address'] : ''); ?>" required>
         </div>
         <div class="mb-3">
-            <label for="payment_info" class="form-label">Payment Method:</label><br>
+            <label for="payment_method" class="form-label">Payment Method:</label><br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" id="visa" name="payment_method" 
                 value="Visa" <?php echo (isset($_SESSION['user']['payment_method']) && $_SESSION['user']['payment_method'] === 'Visa') ? 'checked' : ''; ?>>
@@ -95,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="mb-3">
             <label for="payment_info" class="form-label">Credit Card Information:</label>
-            <input type="text" class="form-control" id="payment_info" 
-            name="payment_info" value="<?php echo htmlspecialchars(isset($_SESSION['user']['payment_info']) ? $_SESSION['user']['payment_info'] : ''); ?>" required>
+            <input type="text" class="form-control" id="payment_method" 
+            name="payment_method" value="<?php echo htmlspecialchars(isset($_SESSION['user']['payment_method']) ? $_SESSION['user']['payment_method'] : ''); ?>" required>
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

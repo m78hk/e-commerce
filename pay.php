@@ -14,8 +14,8 @@ $userId = $_SESSION['user']['uid'];
 $username = $_SESSION['user']['username'] ?? '';
 $address = $_SESSION['user']['address'] ?? '';
 $phone = $_SESSION['user']['phone'] ?? '';
-$payment_info = $_SESSION['user']['payment_info'] ?? '';
 $payment_method = $_SESSION['user']['payment_method'] ?? '';
+$credit_card = $_SESSION['user']['credit_card'] ?? '';
 $subtotal = $_SESSION['subtotal'] ?? 0;
 $tax = $_SESSION['tax'] ?? 0;
 $shipping = $_SESSION['shipping'] ?? 0;
@@ -43,7 +43,7 @@ $pdf->Cell(0, 10, 'Username: ' . $username, 0, 1);
 $pdf->Cell(0, 10, 'Phone: ' . $phone, 0, 1);
 $pdf->Cell(0, 10, 'Address: ' . $address, 0, 1);
 $pdf->Cell(0, 10, 'Payment Method: ' . $payment_method, 0, 1);
-
+$pdf->Cell(0, 10, 'Credit Card: ' . $credit_card, 0, 1);
 // retrieve order information
 $pdf->Cell(0, 10, 'Subtotal: $' . $subtotal, 0, 1);
 $pdf->Cell(0, 10, 'Tax: $' . $tax, 0, 1);

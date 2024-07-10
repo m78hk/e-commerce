@@ -13,14 +13,14 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['uid'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['address'], $_POST['phone'], $_POST['payment_info'], $_POST['payment_method'])) {
+    if (isset($_POST['address'], $_POST['phone'], $_POST['payment_method'], $_POST['credit_card'])) {
         $address = trim($_POST['address']);
         $phone = trim($_POST['phone']);
-        $payment_info = trim($_POST['payment_info']);
         $payment_method = trim($_POST['payment_method']);
+        $credit_card = trim($_POST['credit_card']);
 
-        $stmt = $pdo->prepare('UPDATE tb_accounts SET address = ?, phone = ?, payment_info = ?, payment_method WHERE uid = ?');
-        if ($stmt->execute([$address, $phone, $payment_info, $payment_method, $userId])) {
+        $stmt = $pdo->prepare('UPDATE tb_accounts SET address = ?, phone = ?, payment_method = ?, credit_card = ? WHERE uid = ?');
+        if ($stmt->execute([$address, $phone, $payment_method, $credit_card, $userId])) {
             echo 'Information saved successfully.';
         } else {
             echo 'Failed to save information.';
@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['address'] = $address;
         $_SESSION['phone'] = $phone;
-        $_SESSION['payment_info'] = $payment_info;
         $_SESSION['payment_method'] = $payment_method;
+        $_SESSION['credit_card'] = $credit_card;
     }
 
     if (isset($_POST['subtotal'], $_POST['tax'], $_POST['shipping'], $_POST['total'], $_POST['cart'])) {
@@ -54,13 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         $_SESSION['address'] = $user['address'] ?? '';
         $_SESSION['phone'] = $user['phone'] ?? '';
-        $_SESSION['payment_info'] = $user['payment_info'] ?? '';
         $_SESSION['payment_method'] = $user['payment_method'] ?? '';
+        $_SESSION['$credit_card'] = $user['credit_card'] ?? '';
     } else {
         $_SESSION['address'] = '';
         $_SESSION['phone'] = '';
-        $_SESSION['payment_info'] = '';
         $_SESSION['payment_method'] = '';
+        $_SESSION['credit_card'] = '';
     }
 
     $_SESSION['subtotal'] = $_SESSION['subtotal'] ?? 0;
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $address = $_SESSION['address'] ?? '';
     $phone = $_SESSION['phone'] ?? '';
-    $payment_info = $_SESSION['payment_info'] ?? '';
     $payment_method = $_SESSION['payment_method'] ?? '';
+    $credit_card = $_SESSION['credit_card'] ?? '';
 
     $subtotal = $_SESSION['subtotal'] ?? 0;
     $tax = $_SESSION['tax'] ?? 0;
@@ -132,13 +132,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? ''); ?>" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="payment_method" class="form-label">Payment Method:</label>
-                        <input type="text" class="form-control" id="payment_method" name="payment_method" 
-                        value="<?php echo htmlspecialchars($_SESSION['user']['payment_method'] ?? ''); ?>" readonly>
+                        <label class="form-label">Payment Method:</label><br>
+                        <?php if (isset($_SESSION['user']['payment_method'])): ?>
+                        <p class="form-control-plaintext"><?php echo htmlspecialchars($_SESSION['user']['payment_method']); ?></p>
+                        <?php else: ?>
+                            <p class="form-control-plaintext">Not specified</p>
+                        <?php endif; ?>
                     </div>
                     <div class="mb-3">
-                        <label for="payment_info" class="form-label">Credit Card Information:</label>
-                        <input type="text" class="form-control" id="payment_info" name="payment_info" 
+                        <label for="credit_card" class="form-label">Credit Card Information:</label>
+                        <input type="text" class="form-control" id="payment_info" name="credit_card" 
                         value="<?php echo htmlspecialchars($_SESSION['user']['payment_info'] ?? ''); ?>" readonly>
                     </div>
                 </div>

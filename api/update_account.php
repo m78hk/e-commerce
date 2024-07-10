@@ -17,21 +17,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     error_log(print_r($input, true)); // log the input for debugging
 
-    if (isset($input['email'], $input['phone'], $input['address'], $input['payment_info'])) {
+    if (isset($input['email'], $input['phone'], $input['address'], $input['payment_method'], $input['credit_card'])) {
         $email = trim($input['email']);
         $phone = trim($input['phone']);
         $address = trim($input['address']);
-        $payment_info = trim($input['payment_info']);
+        $payment_method = trim($input['payment_method']);
+        $credit_card = trim($input['credit_card']);
 
         try {
             if (!empty($input['password'])) {
                 $password = password_hash($input['password'], PASSWORD_DEFAULT); 
-                $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, password = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
-                $stmt->execute([$email, $password, $phone, $address, $payment_info, $userId]);
+                $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, password = ?, phone = ?, address = ?, payment_method = ?, credit_card = ? WHERE uid = ?');
+                $stmt->execute([$email, $password, $phone, $address, $payment_method, $credit_card, $userId]);
                 error_log('Password updated.');
             } else {
-                $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, phone = ?, address = ?, payment_info = ? WHERE uid = ?');
-                $stmt->execute([$email, $phone, $address, $payment_info, $userId]);
+                $stmt = $pdo->prepare('UPDATE tb_accounts SET email = ?, phone = ?, address = ?, payment_method = ?, credit_card = ? WHERE uid = ?');
+                $stmt->execute([$email, $phone, $address, $payment_method, $credit_card, $userId]);
                 error_log('Password not updated.');
             }
 
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         try {
-            $pdo = new PDO($dsn, $user, $pass, $options);
+            //$pdo = new PDO($dsn, $user, $pass, $options);
             error_log('Database connection successful.'); // Add this line
         } catch (\PDOException $e) {
             error_log('Connection failed: ' . $e->getMessage()); // Add this line

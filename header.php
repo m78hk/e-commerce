@@ -80,12 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           // Handle successful registration
           if ($firebaseUser) {
-            // 插入資料到本地數據庫的 tb_accounts 表
-            $stmt = $pdo->prepare('INSERT INTO general_user (username, email, password, firebase_uid) VALUES (?, ?, ?, ?)');
+            // Insert user data into phpMyAdmin database
+            $stmt = $pdo->prepare('INSERT INTO tb_accounts (username, email, password, firebase_uid) VALUES (?, ?, ?, ?)');
             $success = $stmt->execute([$username, $email, $hashed_password, $firebaseUser->uid]);
         
             if ($success) {
-                // 設置 session 或進行重定向等後續操作
+                // set session
                 $_SESSION['user'] = [
                     'uid' => $firebaseUser->uid,
                     'username' => $username,
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: index.php');
                 exit();
             } else {
-                // 處理數據庫插入錯誤
+                // error inserting user data into phpMyAdmin database
                 $error = 'Failed to insert user data into generl_user.';
             }
         } else {
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($firebaseUser) {
       //Retrieve user data from phpMyAdmin database
-      $stmt = $pdo->prepare('SELECT * FROM general_user WHERE email = ?');
+      $stmt = $pdo->prepare('SELECT * FROM tb_accounts WHERE email = ?');
       $stmt->execute([$email]);
       $user = $stmt->fetch();
 
@@ -133,7 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'email' => $user['email'],
           'phone' => $user['phone'],
           'address' => $user['address'],
-          'payment_info' => $user['payment_info']
+          'payment_method' => $user['payment_method'],
+          'credit_card' => $user['$credit_card']
         ];
       
 

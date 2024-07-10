@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 09, 2024 at 05:04 AM
+-- Generation Time: Jul 10, 2024 at 02:45 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -35,13 +35,11 @@ CREATE TABLE IF NOT EXISTS `tb_accounts` (
   `email` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `phone` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `payment_info` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `payment_method` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `credit_card` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `role` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'user',
   `is_admin` tinyint(1) DEFAULT 0,
   `firebase_uid` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `payment_method` varchar(255) NOT NULL,
-  `visa` varchar(255) NOT NULL,
-  `master` varchar(255) NOT NULL,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -49,10 +47,8 @@ CREATE TABLE IF NOT EXISTS `tb_accounts` (
 -- Dumping data for table `tb_accounts`
 --
 
-INSERT INTO `tb_accounts` (`uid`, `username`, `password`, `email`, `phone`, `address`, `payment_info`, `role`, `is_admin`, `firebase_uid`, `payment_method`, `visa`, `master`) VALUES
-(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '123456789', 'abcd1213', '98765432', 'admin', 1, '', '', '', ''),
-(12, 'customer1', '$2y$10$TU1h.mSvVZ3oPTE4.KV5L.HYV38SYvvNvGYXCTlq8h2kXUHaWE/Ri', 'qwe@qwe.com', '987654321', '', '', 'user', 0, '', '', '', ''),
-(15, 'customer 7', '$2y$10$EQuwJ1dUtCK0Hu75Akh0w.KSl4PTR8ifyFHLfl6bJbMfIDlDxSoXG', 'cvb@cvb.com', '123456', 'abc', '1234', 'user', 0, 'HpwjQDNWZfXv1zkYntspdOPURCv1', '', '', '');
+INSERT INTO `tb_accounts` (`uid`, `username`, `password`, `email`, `phone`, `address`, `payment_method`, `credit_card`, `role`, `is_admin`, `firebase_uid`) VALUES
+(4, 'roy', '$2y$10$W7wOVvJjYkgdGll5C.gIw.Toq6qnZbrm/7rViCgRfKZzZ1QJUzvqu', 'abc@abc.com', '123456789', 'abcd1213', 'visa', '', 'user', 1, '');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
