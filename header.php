@@ -253,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </a>
                     <ul class="dropdown-menu product-dropdown-menu">
                       <li><a class="dropdown-item" href= "./product_1.php">Supermarket</a></li>
-                      <!--<li><a class="dropdown-item" href= "./product_2.php">Electronic product</a></li>-->
+                      <!--<li><a class="dropdown-item" href= "./product_2.php">Electronic Appliances</a></li>-->
                    </ul>
                  </li>
               </ul>

@@ -70,7 +70,7 @@ switch ($action) {
         echo json_encode(['message' => 'Invalid action']);
         break;  }
 } catch (Exception $e) {
-    // 捕獲任何異常並返回JSON格式的錯誤訊息
+    // error_log
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

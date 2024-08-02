@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supermarket Backend</title>
+    <title>Product Management</title>
 </head>
 <body>
     <h1>Product Management</h1>
@@ -49,12 +49,15 @@
             <option value="5">5</option>
         </select><br>
         <br>
-        <label>Best Seller Label:</label>
+        <label>Best Seller or Product Label:</label>
         <select name="best_seller_label" required>
             <option value="all">All</option>
             <option value="best sellers">Best Sellers</option>
             <option value="featured">Featured</option>
             <option value="new arrival">New Arrival</option>
+            <option value="Computer">Computer</option>
+            <option value="TV">TV</option>
+            <option value="Refrigerator">Refrigerator</option>
         </select><br>
         <br>
         <label>Quantity:</label>
@@ -153,12 +156,15 @@
                 <option value="4.5">4.5</option>
                 <option value="5">5</option>
             </select><br>
-            <label>Best Seller Label:</label>
-            <select name="best_seller_label" id="edit-product-best-seller-label" required>
+            <label>Best Seller or Product Label:</label>
+            <select name="best_seller_or_product_label" id="edit-product-best-seller-label" required>
                 <option value="all">All</option>
                 <option value="best sellers">Best Sellers</option>
                 <option value="featured">Featured</option>
                 <option value="new arrival">New Arrival</option>
+                <option value="Computer">Computer</option>
+                <option value="TV">TV</option>
+                <option value="Refrigerator">Refrigerator</option>
             </select><br>
             <label>Quantity:</label>
             <input type="number" name="quantity" id="edit-product-quantity" required><br>

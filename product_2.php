@@ -21,7 +21,7 @@ $products = $stmt->fetchAll();
   <section id="collection" class="py-5">
     <div class="container">
       <div class="title text-center">
-        <h2 class="position-relative d-inline-block">Supermarket</h2>
+        <h2 class="position-relative d-inline-block">Electrical Appliances</h2>
       </div>
     </div>
 
@@ -29,8 +29,8 @@ $products = $stmt->fetchAll();
       <div class="d-flex flex-wrap justify-content-center mt-5 filter-button-group">
         <button type="button" class="btn m-2 text-dark active-filter-btn" data-filter="*">All</button>
         <button type="button" class="btn m-2 text-dark" data-filter=".best-sellers">Computer</button>
-        <button type="button" class="btn m-2 text-dark" data-filter=".featured">Featured</button>
-        <button type="button" class="btn m-2 text-dark" data-filter=".new-arrival">New Arrival</button>
+        <button type="button" class="btn m-2 text-dark" data-filter=".featured">TV</button>
+        <button type="button" class="btn m-2 text-dark" data-filter=".new-arrival">Refrigerator</button>
       </div>
 
       <div class="collection-list mt-4 row gx-0 gy-3">
