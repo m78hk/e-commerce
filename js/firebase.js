@@ -8,13 +8,13 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
-  authDomain: "abcshop-web.firebaseapp.com",
-  projectId: "abcshop-web",
-  storageBucket: "abcshop-web.appspot.com",
-  messagingSenderId: "293629346772",
-  appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
-  measurementId: "G-RNF3QDCT8F"
+  apiKey: 
+  authDomain: 
+  projectId: 
+  storageBucket:
+  messagingSenderId: 
+  appId: 
+  measurementId: 
 };
 
 // Initialize Firebase
