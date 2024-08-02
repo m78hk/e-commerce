@@ -339,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
 // firebase configuration
   var firebaseConfig = {
-    apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
+    apiKey: 
     authDomain: "abcshop-web.firebaseapp.com",
     projectId: "abcshop-web",
     storageBucket: "abcshop-web.appspot.com",
