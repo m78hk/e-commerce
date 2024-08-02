@@ -317,13 +317,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
 // firebase configuration
   var firebaseConfig = {
-    apiKey: "AIzaSyAaHo422K_N-JmZ6Ziq8ur-6a2sZ3_OFRQ",
-    authDomain: "abcshop-web.firebaseapp.com",
-    projectId: "abcshop-web",
-    storageBucket: "abcshop-web.appspot.com",
-    messagingSenderId: "293629346772",
-    appId: "1:293629346772:web:30e0219f215ab1e2bdcc41",
-    measurementId: "G-RNF3QDCT8F"
+    apiKey: 
+    authDomain:
+    projectId: 
+    storageBucket:
+    messagingSenderId:
+    appId: 
+    measurementId: 
   };
   // Firebase initialization
   firebase.initializeApp(firebaseConfig);
